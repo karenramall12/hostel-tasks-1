@@ -463,6 +463,106 @@
                 page-break-inside: avoid;
             }
         }
+
+        .observations-box {
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin: 20px 0;
+        }
+
+        .observations-box h3 {
+            color: var(--dark);
+            margin-bottom: 10px;
+        }
+
+        #shift-observations {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            resize: vertical;
+            font-family: inherit;
+            margin-bottom: 10px;
+        }
+
+        .room-movements-box {
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin: 20px 0;
+        }
+
+        .room-movements-box h3 {
+            color: var(--dark);
+            margin-bottom: 15px;
+        }
+
+        .movement-type {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .movement-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background: #f1f1f1;
+        }
+
+        .movement-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .room-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        #room-select {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .add-movement-btn {
+            padding: 8px 15px;
+            background: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .movements-list {
+            border-top: 1px solid #eee;
+            padding-top: 15px;
+        }
+
+        .movement-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            margin-bottom: 5px;
+        }
+
+        .checkin {
+            border-left: 4px solid var(--secondary);
+        }
+
+        .checkout {
+            border-left: 4px solid var(--warning);
+        }
     </style>
 </head>
 <body>
@@ -1074,6 +1174,56 @@
             </ul>
         </div>
         
+        <!-- Modifique a div room-movements-box -->
+        <div class="room-movements-box">
+            <h3>Check-ins/Check-outs do Turno</h3>
+            <div class="movements-form">
+                <div class="movement-type">
+                    <button class="movement-btn checkin-btn active">Check-in</button>
+                    <button class="movement-btn checkout-btn">Check-out</button>
+                </div>
+                <div class="room-selector">
+                    <select id="room-select">
+                        <option value="">Selecione o quarto/cama...</option>
+                        <optgroup label="Quartos Privativos">
+                            <option value="Q1">Q1 - Black Individual</option>
+                            <option value="Q2">Q2 - Yellow Individual</option>
+                            <option value="Q3">Q3 - Duplo Beliche</option>
+                            <option value="Q4">Q4 - Duplo Beliche (Janela)</option>
+                            <option value="Q5">Q5 - Colors Individual</option>
+                            <option value="Q6">Q6 - Blue Individual</option>
+                            <option value="Q7">Q7 - Duplo/Casal</option>
+                            <option value="Q8">Q8 - Duplo/Casal</option>
+                        </optgroup>
+                        <optgroup label="Quarto Compartilhado">
+                            <option value="QC1">Cama 1 - Quarto Misto</option>
+                            <option value="QC2">Cama 2 - Quarto Misto</option>
+                            <option value="QC3">Cama 3 - Quarto Misto</option>
+                            <option value="QC4">Cama 4 - Quarto Misto</option>
+                            <option value="QC5">Cama 5 - Quarto Misto</option>
+                            <option value="QC6">Cama 6 - Quarto Misto</option>
+                            <option value="QC7">Cama 7 - Quarto Misto</option>
+                            <option value="QC8">Cama 8 - Quarto Misto</option>
+                            <option value="QC9">Cama 9 - Quarto Misto</option>
+                            <option value="QC10">Cama 10 - Quarto Misto</option>
+                            <option value="QC11">Cama 11 - Quarto Misto</option>
+                            <option value="QC12">Cama 12 - Quarto Misto</option>
+                        </optgroup>
+                    </select>
+                    <button id="add-movement" class="add-movement-btn">Adicionar</button>
+                </div>
+                <div class="movements-list">
+                    <!-- Os movimentos serão listados aqui -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Adicione a div de observações logo após -->
+        <div class="observations-box">
+            <h3>Observações para o Próximo Turno</h3>
+            <textarea id="shift-observations" placeholder="Digite aqui recados importantes para o próximo turno (ex: hóspedes aguardando check-in, problemas a resolver, etc)" rows="4"></textarea>
+        </div>
+        
         <button class="save-btn" id="save-progress-btn">Salvar Progresso</button>
     </div>
 
@@ -1544,6 +1694,7 @@
                 }
 
                 const inventoryStatus = confirm("Inventário está OK?") ? "✅ OK" : "⚠️ Pendente";
+                const observations = document.getElementById('shift-observations').value.trim();
 
                 const turnName = activeSection.querySelector('h2').textContent;
                 const tasks = activeSection.querySelectorAll('.task-item');
@@ -1552,15 +1703,26 @@
                 );
                 const progress = Math.round((completedTasks.length / tasks.length) * 100);
 
-                // Criar mensagem formatada no novo formato
+                // Criar mensagem formatada
                 let message = `*📋 Relatório de Tarefas - ${turnName}*\n`;
                 message += `📅 Data: ${new Date().toLocaleDateString('pt-BR')}\n`;
                 message += `⏰ Horário: ${new Date().toLocaleTimeString('pt-BR')}\n\n`;
                 message += `👤 Voluntário: ${volunteerName}\n`;
-                message += `💰 Caixa: R$ ${Number(cashAmount).toFixed(2)}\n`;
+                message += `💰 Caixa: R$ ${Number(cashAmount.replace(',', '.')).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}\n`;
                 message += `📦 Inventário: ${inventoryStatus}\n\n`;
 
-                // Adicionar tarefas concluídas usando as versões curtas
+                // Adicionar movimentos de quartos se houver
+                const movements = document.querySelectorAll('.movement-item');
+                if (movements.length > 0) {
+                    message += `*🔄 Check-ins/Check-outs:*\n`;
+                    movements.forEach(movement => {
+                        const text = movement.querySelector('span').textContent;
+                        message += `• ${text}\n`;
+                    });
+                    message += '\n';
+                }
+
+                // Adicionar tarefas concluídas
                 message += `*✅ Tarefas Concluídas:*\n`;
                 completedTasks.forEach(task => {
                     const text = task.querySelector('.task-text').textContent;
@@ -1568,25 +1730,10 @@
                     message += `${shortText}\n`;
                 });
 
-                // Adicionar tarefas pendentes usando as versões curtas
-                const pendingTasks = Array.from(tasks).filter(task => 
-                    !task.querySelector('.task-checkbox').checked
-                );
-
-                if (pendingTasks.length > 0) {
-                    message += `\n*⏳ Tarefas Pendentes:*\n`;
-                    pendingTasks.forEach(task => {
-                        const text = task.querySelector('.task-text').textContent;
-                        const shortText = taskShortNames[text] || text;
-                        message += `${shortText}\n`;
-                    });
+                // Adicionar observações se houver (incluindo justificativas para tarefas não realizadas)
+                if (observations) {
+                    message += `\n*📝 Observações/Justificativas:*\n${observations}\n`;
                 }
-
-                // Adicionar resumo
-                message += `\n📊 *Resumo:*\n`;
-                message += `✅ Concluídas: ${completedTasks.length}\n`;
-                message += `⏳ Pendentes: ${tasks.length - completedTasks.length}\n`;
-                message += `📈 Progresso: ${progress}%`;
 
                 // Copiar para área de transferência
                 try {
@@ -1602,6 +1749,9 @@
                     document.body.removeChild(tempTextArea);
                     alert('Relatório copiado! Cole no WhatsApp.');
                 }
+
+                // Limpar observações após enviar
+                document.getElementById('shift-observations').value = '';
 
                 // Salvar estado
                 localStorage.setItem('lastTaskState', JSON.stringify({
@@ -1756,6 +1906,36 @@
             "Guardar as chaves do hostel e do quadro de chaves na recepção": "• Chaves guardadas ✅",
             "Virar a plaquinha da corrente para o lado \"fechado\" ao finalizar": "• Placa de fechado virada ✅"
         };
+
+        // Adicione ao seu JavaScript existente
+        document.querySelectorAll('.movement-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.movement-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        document.getElementById('add-movement').addEventListener('click', function() {
+            const room = document.getElementById('room-select');
+            if (!room.value) {
+                alert('Selecione um quarto');
+                return;
+            }
+
+            const isCheckin = document.querySelector('.checkin-btn').classList.contains('active');
+            const type = isCheckin ? 'Check-in' : 'Check-out';
+            const roomText = room.options[room.selectedIndex].text;
+
+            const movementItem = document.createElement('div');
+            movementItem.className = `movement-item ${isCheckin ? 'checkin' : 'checkout'}`;
+            movementItem.innerHTML = `
+                <span>${type}: ${roomText}</span>
+                <button class="remove-movement" onclick="this.parentElement.remove()">×</button>
+            `;
+
+            document.querySelector('.movements-list').appendChild(movementItem);
+            room.value = '';
+        });
     </script>
 </body>
 </html>
