@@ -1531,6 +1531,20 @@
                 const activeSection = document.querySelector('.shift-section.active');
                 if (!activeSection) return;
 
+                const volunteerName = prompt("Nome do voluntário:");
+                if (!volunteerName) {
+                    alert("Por favor, informe seu nome!");
+                    return;
+                }
+
+                const cashAmount = prompt("Valor em caixa (R$):");
+                if (!cashAmount) {
+                    alert("Por favor, informe o valor em caixa!");
+                    return;
+                }
+
+                const inventoryStatus = confirm("Inventário está OK?") ? "✅ OK" : "⚠️ Pendente";
+
                 const turnName = activeSection.querySelector('h2').textContent;
                 const tasks = activeSection.querySelectorAll('.task-item');
                 const completedTasks = Array.from(tasks).filter(task => 
@@ -1538,30 +1552,35 @@
                 );
                 const progress = Math.round((completedTasks.length / tasks.length) * 100);
 
-                // Criar mensagem formatada
+                // Criar mensagem formatada no novo formato
                 let message = `*📋 Relatório de Tarefas - ${turnName}*\n`;
                 message += `📅 Data: ${new Date().toLocaleDateString('pt-BR')}\n`;
                 message += `⏰ Horário: ${new Date().toLocaleTimeString('pt-BR')}\n\n`;
+                message += `👤 Voluntário: ${volunteerName}\n`;
+                message += `💰 Caixa: R$ ${Number(cashAmount).toFixed(2)}\n`;
+                message += `📦 Inventário: ${inventoryStatus}\n\n`;
 
-                // Adicionar tarefas concluídas
+                // Adicionar tarefas concluídas usando as versões curtas
                 message += `*✅ Tarefas Concluídas:*\n`;
-                tasks.forEach(task => {
-                    const checkbox = task.querySelector('.task-checkbox');
+                completedTasks.forEach(task => {
                     const text = task.querySelector('.task-text').textContent;
-                    if (checkbox.checked) {
-                        message += `• ${text}\n`;
-                    }
+                    const shortText = taskShortNames[text] || text;
+                    message += `${shortText}\n`;
                 });
 
-                // Adicionar tarefas pendentes
-                message += `\n*⏳ Tarefas Pendentes:*\n`;
-                tasks.forEach(task => {
-                    const checkbox = task.querySelector('.task-checkbox');
-                    const text = task.querySelector('.task-text').textContent;
-                    if (!checkbox.checked) {
-                        message += `• ${text}\n`;
-                    }
-                });
+                // Adicionar tarefas pendentes usando as versões curtas
+                const pendingTasks = Array.from(tasks).filter(task => 
+                    !task.querySelector('.task-checkbox').checked
+                );
+
+                if (pendingTasks.length > 0) {
+                    message += `\n*⏳ Tarefas Pendentes:*\n`;
+                    pendingTasks.forEach(task => {
+                        const text = task.querySelector('.task-text').textContent;
+                        const shortText = taskShortNames[text] || text;
+                        message += `${shortText}\n`;
+                    });
+                }
 
                 // Adicionar resumo
                 message += `\n📊 *Resumo:*\n`;
@@ -1570,39 +1589,32 @@
                 message += `📈 Progresso: ${progress}%`;
 
                 // Copiar para área de transferência
-                navigator.clipboard.writeText(message)
-                    .then(() => {
-                        alert('Relatório copiado para a área de transferência!\nAgora você pode colar no WhatsApp.');
-                    })
-                    .catch(err => {
-                        console.error('Erro ao copiar texto: ', err);
-                        alert('Não foi possível copiar automaticamente. Por favor, copie o texto manualmente.');
-                        // Criar uma área de texto temporária para cópia manual
-                        const tempTextArea = document.createElement('textarea');
-                        tempTextArea.value = message;
-                        document.body.appendChild(tempTextArea);
-                        tempTextArea.select();
-                        try {
-                            document.execCommand('copy');
-                            alert('Texto copiado com sucesso!');
-                        } catch (err) {
-                            alert('Por favor, copie o texto manualmente:\n\n' + message);
-                        }
-                        document.body.removeChild(tempTextArea);
+                try {
+                    navigator.clipboard.writeText(message).then(() => {
+                        alert('Relatório copiado! Cole no WhatsApp.');
                     });
+                } catch (err) {
+                    const tempTextArea = document.createElement('textarea');
+                    tempTextArea.value = message;
+                    document.body.appendChild(tempTextArea);
+                    tempTextArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(tempTextArea);
+                    alert('Relatório copiado! Cole no WhatsApp.');
+                }
 
                 // Salvar estado
-                const saveState = {
+                localStorage.setItem('lastTaskState', JSON.stringify({
                     date: new Date().toISOString(),
+                    volunteer: volunteerName,
+                    cashAmount: cashAmount,
                     shift: turnName,
                     progress: progress,
                     tasks: Array.from(tasks).map(task => ({
                         text: task.querySelector('.task-text').textContent,
                         completed: task.querySelector('.task-checkbox').checked
                     }))
-                };
-
-                localStorage.setItem('lastTaskState', JSON.stringify(saveState));
+                }));
             });
 
             // Adicione este código para os botões de turno
@@ -1688,6 +1700,62 @@
             updateWeekDisplay();
             document.querySelector('.shift-btn[data-shift="morning"]').click();
         });
+
+        const taskShortNames = {
+            // Tarefas Gerais (Para todos os turnos)
+            "Completar todos os checklists da recepção (avise o próximo voluntário caso não consiga terminar alguma atividade)": "• Checklist da recepção completo ✅",
+            "Vender produtos da recepção e receber pagamentos na hora para não criar dívidas": "• Vendas da recepção realizadas ✅",
+            "Passar perfume e ligar a luminária dos quartos com Check-in ao menos 30 minutos antes da chegada": "• Quartos preparados para check-in ✅",
+            "Ficar sempre com o fone da recepção (utilizar a bolsa preta)": "• Telefone na bolsa em uso ✅",
+            "Usar Resear como produto nos vidros dos boxes dos banheiros": "• Boxes dos banheiros limpos ✅",
+            "Manter arrumado o sofá da sala e mesas da sala de alimentação": "• Sala de alimentação organizada ✅",
+            "Em caso de dúvida no check-in, verificar a lista atrás do computador ou avisos na bancada": "• Avisos do check-in verificados ✅",
+
+            // Tarefas Manhã (7:30-13:00)
+            "Enviar mensagem no grupo STAFF de abertura de turno": "• Mensagem de abertura enviada ✅",
+            "Abrir a porta da recepção e o terraço (7:30-10:00)": "• Portas e terraço abertos ✅",
+            "Fazer o café e colocar bolachas e itens na bancada": "• Café e bolachas servidos ✅",
+            "Guardar tudo ao meio dia (encher o pote de bolachas antes)": "• Café e bolachas guardados ✅",
+            "Ligar o computador da sala e colocar música ambiente em volume baixo": "• Música ambiente ligada ✅",
+            "Varrer a área da frente, dos fundos e terraço (molhar as plantas)": "• Áreas varridas e plantas regadas ✅",
+            "Fazer login no sistema, verificar check-ins e check-outs do dia": "• Sistema verificado e atualizado ✅",
+            "Abrir o POS (abrir caixa) para contar dinheiro e fazer inventário dos produtos": "• Caixa aberto e contado ✅",
+            "Verificar caixinha do \"Check-out Express\" antes de subir para os quartos": "• Check-out Express verificado ✅",
+            "Limpar ou enxugar os banheiros (boxes, lixos, repor papel)": "• Banheiros limpos e organizados ✅",
+            "Abrir quartos sem hóspedes para arejar (verificar se precisa organizar/limpar)": "• Quartos arejados e verificados ✅",
+            "Retirar lençóis dos quartos de check-out que saírem antes das 11h": "• Lençóis dos check-outs retirados ✅",
+            "Passar pano com álcool nas mesas do refeitório e balcão": "• Mesas higienizadas ✅",
+            "Varrer os tapetes de entrada, da cozinha e dos banheiros": "• Tapetes varridos e limpos ✅",
+            "Lavar no tanque os panos de limpeza usados e pendurar na varanda": "• Panos de limpeza lavados ✅",
+            "Secar e guardar louças do escorredor": "• Louças secas e guardadas ✅",
+            "Encerrar o turno passando informações para o próximo voluntário": "• Informações passadas ao próximo ✅",
+            "Enviar relatório de encerramento no grupo STAFF (nº hóspedes, valor no caixa, recados)": "• Relatório final enviado ✅",
+            "Deslogar do POS e do sistema": "• Sistema e POS fechados ✅",
+
+            // Tarefas Tarde (13:00-18:00)
+            "Enviar mensagem no grupo STAFF (tarde)": "• Mensagem tarde enviada ✅",
+            "Verificar se os quartos que estão aguardando check-ins estão OK": "• Quartos de check-in verificados ✅",
+            "Varrer o corredor, escadas e piso do quarto compartilhado": "• Corredores e escadas limpos ✅",
+            "Verificar se precisa passar pano com produto no piso da sala e/ou cozinha": "• Pisos limpos com produto ✅",
+            "Ajudar na lavanderia com as roupas de cama quando necessário": "• Roupas de cama organizadas ✅",
+
+            // Tarefas Noite (18:00-23:30)
+            "Enviar mensagem no grupo STAFF (noite)": "• Mensagem noite enviada ✅",
+            "Juntar os lixos e retirar os sacos que estiverem na entrada (usar alarme às 19:00)": "• Lixo recolhido e retirado ✅",
+            "Verificar se os quartos que estão aguardando check-ins estão OK": "• Quartos de check-in verificados ✅",
+            "Encerrar o turno deixando informações para o próximo voluntário": "• Informações passadas ✅",
+
+            // Procedimentos de Fechamento
+            "Retirar o filtro da tomada e trancar o cadeado do escritório": "• Filtro desligado e escritório fechado ✅",
+            "Colocar máquinas de cartões, celular e fone sem fio do hostel para carregar": "• Equipamentos carregando ✅",
+            "Fazer a última contagem do caixa do dia": "• Caixa final conferido ✅",
+            "Verificar se o freezer de bebidas e o estoque de doces/diversos estão trancados": "• Freezer e estoque trancados ✅",
+            "Fechar com chave a porta da varanda (orientar hóspedes a fechar após o uso)": "• Porta da varanda trancada ✅",
+            "Desligar os computadores (colocar revistas sobre o computador da recepção)": "• Computadores desligados ✅",
+            "Apagar as luzes da recepção, cozinha e fundos": "• Luzes apagadas ✅",
+            "Guardar as chaves do hostel e do quadro de chaves na recepção": "• Chaves guardadas ✅",
+            "Virar a plaquinha da corrente para o lado \"fechado\" ao finalizar": "• Placa de fechado virada ✅"
+        };
     </script>
 </body>
 </html>
