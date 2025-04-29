@@ -1,0 +1,558 @@
+:root {
+    --primary: #F47B20;    /* Laranja do Hostelaria SP */
+    --secondary: #000000;  /* Preto */
+    --dark: #000000;      /* Preto */
+    --light: #FFFFFF;     /* Branco */
+    --warning: #F47B20;   /* Laranja para alertas */
+    --admin: #F47B20;     /* Laranja para área admin */
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: var(--light);
+    color: var(--dark);
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+header {
+    background-color: var(--primary);
+    color: white;
+    padding: 15px 30px;
+    text-align: center;
+    margin-bottom: 30px;
+    border-radius: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+h1 {
+    font-size: 2rem;
+    margin: 0;
+}
+
+.auth-area {
+    display: flex;
+    gap: 15px;
+}
+
+.auth-btn {
+    padding: 8px 15px;
+    background-color: white;
+    color: var(--primary);
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.auth-btn.admin {
+    background-color: var(--admin);
+    color: white;
+}
+
+/* Estilos da Área Admin */
+.admin-panel {
+    display: none;
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    margin-bottom: 30px;
+}
+
+.admin-panel.active {
+    display: block;
+}
+
+.week-selector {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    align-items: center;
+}
+
+.week-nav {
+    display: flex;
+    gap: 10px;
+}
+
+.week-btn {
+    padding: 5px 10px;
+    background-color: var(--light);
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.current-week {
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.schedule-grid {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.schedule-header {
+    background-color: var(--dark);
+    color: white;
+    padding: 10px;
+    text-align: center;
+    font-weight: bold;
+    border-radius: 3px;
+}
+
+.schedule-cell {
+    background-color: var(--light);
+    padding: 10px;
+    min-height: 80px;
+    border-radius: 3px;
+    position: relative;
+}
+
+.shift-time {
+    font-size: 0.8rem;
+    color: #7f8c8d;
+    margin-bottom: 5px;
+}
+
+.volunteer-name {
+    font-weight: bold;
+}
+
+.add-volunteer {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    background-color: var(--secondary);
+    color: white;
+    border: none;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.volunteer-form {
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    margin-top: 20px;
+    display: none;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.form-group input, .form-group select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.form-btn {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.save-btn {
+    background-color: var(--secondary);
+    color: white;
+}
+
+.cancel-btn {
+    background-color: #95a5a6;
+    color: white;
+}
+
+.volunteer-list {
+    margin-top: 30px;
+}
+
+.volunteer-item {
+    background-color: white;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 2px 3px rgba(0,0,0,0.1);
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.volunteer-info {
+    flex-grow: 1;
+}
+
+.volunteer-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.action-btn {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 0.8rem;
+}
+
+.edit-btn {
+    background-color: var(--primary);
+    color: white;
+}
+
+.delete-btn {
+    background-color: var(--warning);
+    color: white;
+}
+
+/* Estilos do Sistema de Tarefas */
+.shift-selector {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.shift-btn {
+    padding: 10px 20px;
+    background-color: var(--dark);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.shift-btn:hover {
+    background-color: #2c3e50;
+}
+
+.shift-btn.active {
+    background-color: var(--secondary);
+}
+
+.shift-section {
+    display: none;
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    margin-bottom: 30px;
+}
+
+.shift-section.active {
+    display: block;
+}
+
+.task-item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.task-item:last-child {
+    border-bottom: none;
+}
+
+.task-checkbox {
+    margin-right: 10px;
+    margin-top: 3px;
+}
+
+.task-text {
+    flex-grow: 1;
+}
+
+.task-completed .task-text {
+    text-decoration: line-through;
+    color: #95a5a6;
+}
+
+.photo-btn {
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    margin-left: 10px;
+    transition: all 0.3s ease;
+}
+
+.photo-btn:hover {
+    background-color: #2980b9;
+}
+
+.photo-container {
+    display: none;
+    margin-top: 10px;
+    border: 1px dashed #ccc;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.photo-wrapper {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.photo-box {
+    width: 48%;
+    text-align: center;
+}
+
+.photo-preview {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 5px;
+    margin-bottom: 5px;
+    background-color: #f5f5f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #95a5a6;
+    font-size: 0.8rem;
+}
+
+.take-photo {
+    background-color: var(--secondary);
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 0.8rem;
+}
+
+.take-photo:hover {
+    background-color: #27ae60;
+}
+
+.progress-bar {
+    height: 10px;
+    background-color: #ecf0f1;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+.progress {
+    height: 100%;
+    background-color: var(--secondary);
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+.progress-text {
+    text-align: right;
+    margin-bottom: 10px;
+    font-weight: bold;
+    color: var(--dark);
+}
+
+.save-btn {
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    display: block;
+    margin: 20px auto;
+    transition: all 0.3s ease;
+}
+
+.save-btn:hover {
+    background-color: #2980b9;
+}
+
+.export-btn {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    background-color: var(--dark);
+    color: white;
+    margin: 20px auto;
+    display: block;
+}
+
+@media (max-width: 768px) {
+    .schedule-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .schedule-header:first-child {
+        display: none;
+    }
+    
+    .schedule-cell::before {
+        content: attr(data-day);
+        font-weight: bold;
+        display: block;
+        margin-bottom: 5px;
+    }
+    
+    .photo-wrapper {
+        flex-direction: column;
+    }
+    
+    .photo-box {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+}
+
+@media print {
+    .task-item {
+        page-break-inside: avoid;
+    }
+}
+
+.observations-box {
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    margin: 20px 0;
+}
+
+.observations-box h3 {
+    color: var(--dark);
+    margin-bottom: 10px;
+}
+
+#shift-observations {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    resize: vertical;
+    font-family: inherit;
+    margin-bottom: 10px;
+}
+
+.room-movements-box {
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    margin: 20px 0;
+}
+
+.room-movements-box h3 {
+    color: var(--dark);
+    margin-bottom: 15px;
+}
+
+.movement-type {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.movement-btn {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background: #f1f1f1;
+}
+
+.movement-btn.active {
+    background: var(--primary);
+    color: white;
+}
+
+.room-selector {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+#room-select {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.add-movement-btn {
+    padding: 8px 15px;
+    background: var(--secondary);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.movements-list {
+    border-top: 1px solid #eee;
+    padding-top: 15px;
+}
+
+.movement-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px;
+    background: #f8f9fa;
+    border-radius: 5px;
+    margin-bottom: 5px;
+}
+
+.checkin {
+    border-left: 4px solid var(--secondary);
+}
+
+.checkout {
+    border-left: 4px solid var(--warning);
+}

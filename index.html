@@ -4,567 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema Hostel - Tarefas e Voluntários</title>
-    <style>
-        :root {
-            --primary: #3498db;
-            --secondary: #2ecc71;
-            --dark: #34495e;
-            --light: #ecf0f1;
-            --warning: #e74c3c;
-            --admin: #9b59b6;
-        }
-        
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        body {
-            background-color: var(--light);
-            color: var(--dark);
-            line-height: 1.6;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        
-        header {
-            background-color: var(--primary);
-            color: white;
-            padding: 15px 30px;
-            text-align: center;
-            margin-bottom: 30px;
-            border-radius: 5px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        h1 {
-            font-size: 2rem;
-            margin: 0;
-        }
-        
-        .auth-area {
-            display: flex;
-            gap: 15px;
-        }
-        
-        .auth-btn {
-            padding: 8px 15px;
-            background-color: white;
-            color: var(--primary);
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        
-        .auth-btn.admin {
-            background-color: var(--admin);
-            color: white;
-        }
-        
-        /* Estilos da Área Admin */
-        .admin-panel {
-            display: none;
-            background-color: white;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
-        }
-        
-        .admin-panel.active {
-            display: block;
-        }
-        
-        .week-selector {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-            align-items: center;
-        }
-        
-        .week-nav {
-            display: flex;
-            gap: 10px;
-        }
-        
-        .week-btn {
-            padding: 5px 10px;
-            background-color: var(--light);
-            border: none;
-            border-radius: 3px;
-            cursor: pointer;
-        }
-        
-        .current-week {
-            font-weight: bold;
-            font-size: 1.1rem;
-        }
-        
-        .schedule-grid {
-            display: grid;
-            grid-template-columns: repeat(8, 1fr);
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        
-        .schedule-header {
-            background-color: var(--dark);
-            color: white;
-            padding: 10px;
-            text-align: center;
-            font-weight: bold;
-            border-radius: 3px;
-        }
-        
-        .schedule-cell {
-            background-color: var(--light);
-            padding: 10px;
-            min-height: 80px;
-            border-radius: 3px;
-            position: relative;
-        }
-        
-        .shift-time {
-            font-size: 0.8rem;
-            color: #7f8c8d;
-            margin-bottom: 5px;
-        }
-        
-        .volunteer-name {
-            font-weight: bold;
-        }
-        
-        .add-volunteer {
-            position: absolute;
-            bottom: 5px;
-            right: 5px;
-            background-color: var(--secondary);
-            color: white;
-            border: none;
-            width: 25px;
-            height: 25px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .volunteer-form {
-            background-color: white;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            margin-top: 20px;
-            display: none;
-        }
-        
-        .form-group {
-            margin-bottom: 15px;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        
-        .form-group input, .form-group select {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 3px;
-        }
-        
-        .form-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            margin-top: 20px;
-        }
-        
-        .form-btn {
-            padding: 8px 15px;
-            border: none;
-            border-radius: 3px;
-            cursor: pointer;
-        }
-        
-        .save-btn {
-            background-color: var(--secondary);
-            color: white;
-        }
-        
-        .cancel-btn {
-            background-color: #95a5a6;
-            color: white;
-        }
-        
-        .volunteer-list {
-            margin-top: 30px;
-        }
-        
-        .volunteer-item {
-            background-color: white;
-            padding: 15px;
-            border-radius: 5px;
-            box-shadow: 0 2px 3px rgba(0,0,0,0.1);
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .volunteer-info {
-            flex-grow: 1;
-        }
-        
-        .volunteer-actions {
-            display: flex;
-            gap: 10px;
-        }
-        
-        .action-btn {
-            padding: 5px 10px;
-            border: none;
-            border-radius: 3px;
-            cursor: pointer;
-            font-size: 0.8rem;
-        }
-        
-        .edit-btn {
-            background-color: var(--primary);
-            color: white;
-        }
-        
-        .delete-btn {
-            background-color: var(--warning);
-            color: white;
-        }
-        
-        /* Estilos do Sistema de Tarefas */
-        .shift-selector {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 20px;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        
-        .shift-btn {
-            padding: 10px 20px;
-            background-color: var(--dark);
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .shift-btn:hover {
-            background-color: #2c3e50;
-        }
-        
-        .shift-btn.active {
-            background-color: var(--secondary);
-        }
-        
-        .shift-section {
-            display: none;
-            background-color: white;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
-        }
-        
-        .shift-section.active {
-            display: block;
-        }
-        
-        .task-item {
-            display: flex;
-            align-items: flex-start;
-            margin-bottom: 15px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #eee;
-        }
-        
-        .task-item:last-child {
-            border-bottom: none;
-        }
-        
-        .task-checkbox {
-            margin-right: 10px;
-            margin-top: 3px;
-        }
-        
-        .task-text {
-            flex-grow: 1;
-        }
-        
-        .task-completed .task-text {
-            text-decoration: line-through;
-            color: #95a5a6;
-        }
-        
-        .photo-btn {
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 3px;
-            cursor: pointer;
-            font-size: 0.8rem;
-            margin-left: 10px;
-            transition: all 0.3s ease;
-        }
-        
-        .photo-btn:hover {
-            background-color: #2980b9;
-        }
-        
-        .photo-container {
-            display: none;
-            margin-top: 10px;
-            border: 1px dashed #ccc;
-            padding: 10px;
-            border-radius: 5px;
-        }
-        
-        .photo-wrapper {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-        }
-        
-        .photo-box {
-            width: 48%;
-            text-align: center;
-        }
-        
-        .photo-preview {
-            width: 100%;
-            height: 150px;
-            object-fit: cover;
-            border-radius: 5px;
-            margin-bottom: 5px;
-            background-color: #f5f5f5;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #95a5a6;
-            font-size: 0.8rem;
-        }
-        
-        .take-photo {
-            background-color: var(--secondary);
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 3px;
-            cursor: pointer;
-            font-size: 0.8rem;
-        }
-        
-        .take-photo:hover {
-            background-color: #27ae60;
-        }
-        
-        .progress-bar {
-            height: 10px;
-            background-color: #ecf0f1;
-            border-radius: 5px;
-            margin-bottom: 20px;
-            overflow: hidden;
-        }
-        
-        .progress {
-            height: 100%;
-            background-color: var(--secondary);
-            width: 0%;
-            transition: width 0.3s ease;
-        }
-        
-        .progress-text {
-            text-align: right;
-            margin-bottom: 10px;
-            font-weight: bold;
-            color: var(--dark);
-        }
-        
-        .save-btn {
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1rem;
-            display: block;
-            margin: 20px auto;
-            transition: all 0.3s ease;
-        }
-        
-        .save-btn:hover {
-            background-color: #2980b9;
-        }
-        
-        .export-btn {
-            padding: 8px 15px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-            background-color: var(--dark);
-            color: white;
-            margin: 20px auto;
-            display: block;
-        }
-        
-        @media (max-width: 768px) {
-            .schedule-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .schedule-header:first-child {
-                display: none;
-            }
-            
-            .schedule-cell::before {
-                content: attr(data-day);
-                font-weight: bold;
-                display: block;
-                margin-bottom: 5px;
-            }
-            
-            .photo-wrapper {
-                flex-direction: column;
-            }
-            
-            .photo-box {
-                width: 100%;
-                margin-bottom: 10px;
-            }
-        }
+    <link rel="stylesheet" href="styles.css">
 
-        @media print {
-            .task-item {
-                page-break-inside: avoid;
-            }
-        }
-
-        .observations-box {
-            background: white;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            margin: 20px 0;
-        }
-
-        .observations-box h3 {
-            color: var(--dark);
-            margin-bottom: 10px;
-        }
-
-        #shift-observations {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            resize: vertical;
-            font-family: inherit;
-            margin-bottom: 10px;
-        }
-
-        .room-movements-box {
-            background: white;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            margin: 20px 0;
-        }
-
-        .room-movements-box h3 {
-            color: var(--dark);
-            margin-bottom: 15px;
-        }
-
-        .movement-type {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-
-        .movement-btn {
-            padding: 8px 15px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            background: #f1f1f1;
-        }
-
-        .movement-btn.active {
-            background: var(--primary);
-            color: white;
-        }
-
-        .room-selector {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-
-        #room-select {
-            flex: 1;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
-
-        .add-movement-btn {
-            padding: 8px 15px;
-            background: var(--secondary);
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .movements-list {
-            border-top: 1px solid #eee;
-            padding-top: 15px;
-        }
-
-        .movement-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px;
-            background: #f8f9fa;
-            border-radius: 5px;
-            margin-bottom: 5px;
-        }
-
-        .checkin {
-            border-left: 4px solid var(--secondary);
-        }
-
-        .checkout {
-            border-left: 4px solid var(--warning);
-        }
-    </style>
+   
 </head>
+<!-- Adicione isso no <head> do seu HTML -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+<script>
+    // Teste rápido
+    database.ref('teste').set({ funcionando: true })
+      .then(() => alert('Banco de dados conectado! 🎉'));
+  </script>
 <body>
     <div class="container">
         <header>
@@ -602,93 +53,93 @@
                 <!-- Manhã -->
                 <div class="schedule-header">Manhã</div>
                 <div class="schedule-cell" data-day="Seg" data-shift="morning">
-                    <div class="shift-time">7:30 - 12:00</div>
+                    <div class="shift-time">7:30 - 13:00</div>
                     <button class="add-volunteer">+</button>
                 </div>
                 <div class="schedule-cell" data-day="Ter" data-shift="morning">
-                    <div class="shift-time">7:30 - 12:00</div>
+                    <div class="shift-time">7:30 - 13:00</div>
                     <button class="add-volunteer">+</button>
                 </div>
                 <div class="schedule-cell" data-day="Qua" data-shift="morning">
-                    <div class="shift-time">7:30 - 12:00</div>
+                    <div class="shift-time">7:30 - 13:00</div>
                     <button class="add-volunteer">+</button>
                 </div>
                 <div class="schedule-cell" data-day="Qui" data-shift="morning">
-                    <div class="shift-time">7:30 - 12:00</div>
+                    <div class="shift-time">7:30 - 13:00</div>
                     <button class="add-volunteer">+</button>
                 </div>
                 <div class="schedule-cell" data-day="Sex" data-shift="morning">
-                    <div class="shift-time">7:30 - 12:00</div>
+                    <div class="shift-time">7:30 - 13:00</div>
                     <button class="add-volunteer">+</button>
                 </div>
                 <div class="schedule-cell" data-day="Sáb" data-shift="morning">
-                    <div class="shift-time">7:30 - 12:00</div>
+                    <div class="shift-time">7:30 - 13:00</div>
                     <button class="add-volunteer">+</button>
                 </div>
                 <div class="schedule-cell" data-day="Dom" data-shift="morning">
-                    <div class="shift-time">7:30 - 12:00</div>
+                    <div class="shift-time">7:30 - 13:00</div>
                     <button class="add-volunteer">+</button>
                 </div>
                 
                 <!-- Tarde -->
                 <div class="schedule-header">Tarde</div>
                 <div class="schedule-cell" data-day="Seg" data-shift="afternoon">
-                    <div class="shift-time">12:00 - 18:00</div>
+                    <div class="shift-time">13:00 - 18:00</div>
                     <button class="add-volunteer">+</button>
                 </div>
                 <div class="schedule-cell" data-day="Ter" data-shift="afternoon">
-                    <div class="shift-time">12:00 - 18:00</div>
+                    <div class="shift-time">13:00 - 18:00</div>
                     <button class="add-volunteer">+</button>
                 </div>
                 <div class="schedule-cell" data-day="Qua" data-shift="afternoon">
-                    <div class="shift-time">12:00 - 18:00</div>
+                    <div class="shift-time">13:00 - 18:00</div>
                     <button class="add-volunteer">+</button>
                 </div>
                 <div class="schedule-cell" data-day="Qui" data-shift="afternoon">
-                    <div class="shift-time">12:00 - 18:00</div>
+                    <div class="shift-time">13:00 - 18:00</div>
                     <button class="add-volunteer">+</button>
                 </div>
                 <div class="schedule-cell" data-day="Sex" data-shift="afternoon">
-                    <div class="shift-time">12:00 - 18:00</div>
+                    <div class="shift-time">13:00 - 18:00</div>
                     <button class="add-volunteer">+</button>
                 </div>
                 <div class="schedule-cell" data-day="Sáb" data-shift="afternoon">
-                    <div class="shift-time">12:00 - 18:00</div>
+                    <div class="shift-time">13:00 - 18:00</div>
                     <button class="add-volunteer">+</button>
                 </div>
                 <div class="schedule-cell" data-day="Dom" data-shift="afternoon">
-                    <div class="shift-time">12:00 - 18:00</div>
+                    <div class="shift-time">13:00 - 18:00</div>
                     <button class="add-volunteer">+</button>
                 </div>
                 
                 <!-- Noite -->
                 <div class="schedule-header">Noite</div>
                 <div class="schedule-cell" data-day="Seg" data-shift="evening">
-                    <div class="shift-time">18:00 - 23:00</div>
+                    <div class="shift-time">18:00 - 23:30</div>
                     <button class="add-volunteer">+</button>
                 </div>
                 <div class="schedule-cell" data-day="Ter" data-shift="evening">
-                    <div class="shift-time">18:00 - 23:00</div>
+                    <div class="shift-time">18:00 - 23:30</div>
                     <button class="add-volunteer">+</button>
                 </div>
                 <div class="schedule-cell" data-day="Qua" data-shift="evening">
-                    <div class="shift-time">18:00 - 23:00</div>
+                    <div class="shift-time">18:00 - 23:30</div>
                     <button class="add-volunteer">+</button>
                 </div>
                 <div class="schedule-cell" data-day="Qui" data-shift="evening">
-                    <div class="shift-time">18:00 - 23:00</div>
+                    <div class="shift-time">18:00 - 23:30</div>
                     <button class="add-volunteer">+</button>
                 </div>
                 <div class="schedule-cell" data-day="Sex" data-shift="evening">
-                    <div class="shift-time">18:00 - 23:00</div>
+                    <div class="shift-time">18:00 - 23:30</div>
                     <button class="add-volunteer">+</button>
                 </div>
                 <div class="schedule-cell" data-day="Sáb" data-shift="evening">
-                    <div class="shift-time">18:00 - 23:00</div>
+                    <div class="shift-time">18:00 - 23:30</div>
                     <button class="add-volunteer">+</button>
                 </div>
                 <div class="schedule-cell" data-day="Dom" data-shift="evening">
-                    <div class="shift-time">18:00 - 23:00</div>
+                    <div class="shift-time">18:00 - 23:30</div>
                     <button class="add-volunteer">+</button>
                 </div>
             </div>
@@ -779,7 +230,7 @@
         </div>
         
         <div class="shift-section morning">
-            <h2>Turno da Manhã (7:30-12:00)</h2>
+            <h2>Turno da Manhã (7:30-13:00)</h2>
             <div class="general-tasks">
                 <h3>Tarefas Gerais (Todos os Turnos)</h3>
                 <ul>
@@ -1226,716 +677,30 @@
         
         <button class="save-btn" id="save-progress-btn">Salvar Progresso</button>
     </div>
+    <!-- No seu HTML (pode remover depois) -->
+<button id="testeLeitura">Testar Conexão</button>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Área Administrativa
-            const adminBtn = document.getElementById('admin-btn');
-            const adminPanel = document.getElementById('admin-panel');
-            const logoutBtn = document.getElementById('logout-btn');
-            
-            adminBtn.addEventListener('click', function() {
-                adminPanel.classList.toggle('active');
-            });
-            
-            logoutBtn.addEventListener('click', function() {
-                alert('Saindo do sistema...');
-                adminPanel.classList.remove('active');
-            });
-            
-            // Navegação por semana
-            const prevWeekBtn = document.getElementById('prev-week');
-            const nextWeekBtn = document.getElementById('next-week');
-            const todayBtn = document.getElementById('today');
-            const currentWeekEl = document.getElementById('current-week');
-            
-            let currentDate = new Date();
-            let volunteers = [];
-            
-            function updateWeekDisplay() {
-                const weekStart = new Date(currentDate);
-                weekStart.setDate(weekStart.getDate() - weekStart.getDay() + 1); // Segunda-feira
-                
-                const weekEnd = new Date(weekStart);
-                weekEnd.setDate(weekEnd.getDate() + 6); // Domingo
-                
-                const options = { day: '2-digit', month: '2-digit' };
-                const startStr = weekStart.toLocaleDateString('pt-BR', options);
-                const endStr = weekEnd.toLocaleDateString('pt-BR', options);
-                
-                currentWeekEl.textContent = `Semana ${startStr} - ${endStr}`;
-                
-                // Carrega voluntários do localStorage para a semana atual
-                loadVolunteersForWeek(weekStart);
-            }
-            
-            function loadVolunteersForWeek(weekStart) {
-                const weekKey = weekStart.toISOString().split('T')[0];
-                const savedData = localStorage.getItem('hostelScheduleData');
-                
-                if (savedData) {
-                    const allData = JSON.parse(savedData);
-                    volunteers = allData[weekKey] || [];
-                } else {
-                    volunteers = [];
-                }
-                
-                renderVolunteers();
-            }
-            
-            function saveVolunteersForWeek(weekStart) {
-                const weekKey = weekStart.toISOString().split('T')[0];
-                let allData = {};
-                
-                const savedData = localStorage.getItem('hostelScheduleData');
-                if (savedData) {
-                    allData = JSON.parse(savedData);
-                }
-                
-                allData[weekKey] = volunteers;
-                localStorage.setItem('hostelScheduleData', JSON.stringify(allData));
-            }
-            
-            prevWeekBtn.addEventListener('click', function() {
-                currentDate.setDate(currentDate.getDate() - 7);
-                updateWeekDisplay();
-            });
-            
-            nextWeekBtn.addEventListener('click', function() {
-                currentDate.setDate(currentDate.getDate() + 7);
-                updateWeekDisplay();
-            });
-            
-            todayBtn.addEventListener('click', function() {
-                currentDate = new Date();
-                updateWeekDisplay();
-            });
-            
-            // Gerenciamento de voluntários
-            const volunteerForm = document.getElementById('volunteer-form');
-            const formTitle = document.getElementById('form-title');
-            const addVolunteerBtns = document.querySelectorAll('.add-volunteer');
-            const cancelVolunteerBtn = document.getElementById('cancel-volunteer');
-            const saveVolunteerBtn = document.getElementById('save-volunteer');
-            const volShiftInput = document.getElementById('vol-shift');
-            const volDayInput = document.getElementById('vol-day');
-            const volNameInput = document.getElementById('vol-name');
-            const volPhoneInput = document.getElementById('vol-phone');
-            const volEmailInput = document.getElementById('vol-email');
-            const exportBtn = document.getElementById('export-btn');
-            
-            let currentCell = null;
-            let isEditing = false;
-            let currentVolunteerId = null;
-            
-            function renderVolunteers() {
-                // Limpa todos os voluntários das células
-                document.querySelectorAll('.volunteer-name').forEach(el => el.remove());
-                
-                // Adiciona os voluntários nas células correspondentes
-                volunteers.forEach(vol => {
-                    const cell = document.querySelector(`.schedule-cell[data-shift="${vol.shift}"][data-day="${vol.day}"]`);
-                    if (cell) {
-                        const volunteerNameEl = document.createElement('div');
-                        volunteerNameEl.className = 'volunteer-name';
-                        volunteerNameEl.textContent = vol.name;
-                        cell.insertBefore(volunteerNameEl, cell.querySelector('.add-volunteer'));
-                    }
-                });
-                
-                // Atualiza a lista de voluntários
-                const volunteerList = document.getElementById('volunteer-list');
-                volunteerList.innerHTML = '<h3>Todos os Voluntários</h3>';
-                
-                if (volunteers.length === 0) {
-                    volunteerList.innerHTML += '<p>Nenhum voluntário cadastrado para esta semana.</p>';
-                    return;
-                }
-                
-                volunteers.forEach(vol => {
-                    const shiftName = 
-                        vol.shift === 'morning' ? 'Manhã' : 
-                        vol.shift === 'afternoon' ? 'Tarde' : 'Noite';
-                    
-                    const volunteerItem = document.createElement('div');
-                    volunteerItem.className = 'volunteer-item';
-                    volunteerItem.innerHTML = `
-                        <div class="volunteer-info">
-                            <div class="volunteer-name">${vol.name}</div>
-                            <div class="volunteer-details">${shiftName} - ${vol.day} | ${vol.phone} | ${vol.email}</div>
-                        </div>
-                        <div class="volunteer-actions">
-                            <button class="action-btn edit-btn" data-id="${vol.id}">Editar</button>
-                            <button class="action-btn delete-btn" data-id="${vol.id}">Remover</button>
-                        </div>
-                    `;
-                    volunteerList.appendChild(volunteerItem);
-                });
-                
-                // Adiciona eventos aos botões de edição e remoção
-                document.querySelectorAll('.edit-btn').forEach(btn => {
-                    btn.addEventListener('click', handleEditVolunteer);
-                });
-                
-                document.querySelectorAll('.delete-btn').forEach(btn => {
-                    btn.addEventListener('click', handleDeleteVolunteer);
-                });
-            }
-            
-            function handleAddVolunteer() {
-                currentCell = this.parentElement;
-                const shift = currentCell.getAttribute('data-shift');
-                const day = currentCell.getAttribute('data-day');
-                
-                let shiftName = '';
-                switch(shift) {
-                    case 'morning': shiftName = 'Manhã'; break;
-                    case 'afternoon': shiftName = 'Tarde'; break;
-                    case 'evening': shiftName = 'Noite'; break;
-                }
-                
-                volShiftInput.value = shiftName;
-                volDayInput.value = day;
-                
-                // Limpar formulário
-                volNameInput.value = '';
-                volPhoneInput.value = '';
-                volEmailInput.value = '';
-                
-                // Configurar como adição
-                isEditing = false;
-                currentVolunteerId = null;
-                formTitle.textContent = 'Adicionar Voluntário';
-                
-                // Exibir formulário
-                volunteerForm.style.display = 'block';
-                window.scrollTo({
-                    top: volunteerForm.offsetTop - 20,
-                    behavior: 'smooth'
-                });
-            }
-            
-            function handleEditVolunteer() {
-                const id = parseInt(this.getAttribute('data-id'));
-                const vol = volunteers.find(v => v.id === id);
-                
-                if (!vol) return;
-                
-                // Encontrar a célula correspondente
-                const cell = document.querySelector(`.schedule-cell[data-shift="${vol.shift}"][data-day="${vol.day}"]`);
-                if (cell) currentCell = cell;
-                
-                let shiftName = '';
-                switch(vol.shift) {
-                    case 'morning': shiftName = 'Manhã'; break;
-                    case 'afternoon': shiftName = 'Tarde'; break;
-                    case 'evening': shiftName = 'Noite'; break;
-                }
-                
-                // Preencher formulário
-                volShiftInput.value = shiftName;
-                volDayInput.value = vol.day;
-                volNameInput.value = vol.name;
-                volPhoneInput.value = vol.phone;
-                volEmailInput.value = vol.email;
-                
-                // Configurar como edição
-                isEditing = true;
-                currentVolunteerId = id;
-                formTitle.textContent = 'Editar Voluntário';
-                
-                // Exibir formulário
-                volunteerForm.style.display = 'block';
-                window.scrollTo({
-                    top: volunteerForm.offsetTop - 20,
-                    behavior: 'smooth'
-                });
-            }
-            
-            function handleDeleteVolunteer() {
-                if (confirm('Tem certeza que deseja remover este voluntário?')) {
-                    const id = parseInt(this.getAttribute('data-id'));
-                    volunteers = volunteers.filter(v => v.id !== id);
-                    
-                    const weekStart = new Date(currentDate);
-                    weekStart.setDate(weekStart.getDate() - weekStart.getDay() + 1);
-                    saveVolunteersForWeek(weekStart);
-                    
-                    renderVolunteers();
-                }
-            }
-            
-            function saveVolunteer() {
-                const name = volNameInput.value.trim();
-                const phone = volPhoneInput.value.trim();
-                const email = volEmailInput.value.trim();
-                const shift = currentCell.getAttribute('data-shift');
-                const day = currentCell.getAttribute('data-day');
-                
-                if (!name) {
-                    alert('Por favor, insira o nome do voluntário');
-                    return;
-                }
-                
-                const weekStart = new Date(currentDate);
-                weekStart.setDate(weekStart.getDate() - weekStart.getDay() + 1);
-                
-                if (isEditing) {
-                    // Atualizar voluntário existente
-                    const volIndex = volunteers.findIndex(v => v.id === currentVolunteerId);
-                    if (volIndex !== -1) {
-                        volunteers[volIndex] = {
-                            id: currentVolunteerId,
-                            name,
-                            phone,
-                            email,
-                            shift,
-                            day
-                        };
-                    }
-                } else {
-                    // Adicionar novo voluntário
-                    const newId = volunteers.length > 0 ? Math.max(...volunteers.map(v => v.id)) + 1 : 1;
-                    volunteers.push({
-                        id: newId,
-                        name,
-                        phone,
-                        email,
-                        shift,
-                        day
-                    });
-                }
-                
-                saveVolunteersForWeek(weekStart);
-                renderVolunteers();
-                volunteerForm.style.display = 'none';
-                currentCell = null;
-            }
-            
-            function exportData() {
-                // Criar um elemento temporário para renderizar o relatório
-                const tempDiv = document.createElement('div');
-                tempDiv.style.width = '800px';
-                tempDiv.style.padding = '20px';
-                tempDiv.style.backgroundColor = 'white';
-                tempDiv.style.position = 'absolute';
-                tempDiv.style.left = '-9999px';
-                
-                // Criar cabeçalho do relatório
-                const header = document.createElement('div');
-                header.innerHTML = `
-                    <h2 style="text-align: center; color: #333; margin-bottom: 20px;">
-                        Escala de Voluntários - ${currentWeekEl.textContent}
-                    </h2>
-                    <div style="text-align: right; color: #666; margin-bottom: 20px;">
-                        Gerado em: ${new Date().toLocaleDateString('pt-BR')}
-                    </div>
-                `;
-            
-                // Criar tabela de horários
-                const table = document.createElement('table');
-                table.style.width = '100%';
-                table.style.borderCollapse = 'collapse';
-                table.style.marginBottom = '20px';
-                
-                // Cabeçalho da tabela
-                const thead = document.createElement('thead');
-                thead.innerHTML = `
-                    <tr style="background-color: #4CAF50; color: white;">
-                        <th style="padding: 10px; border: 1px solid #ddd;">Turno</th>
-                        <th style="padding: 10px; border: 1px solid #ddd;">Seg</th>
-                        <th style="padding: 10px; border: 1px solid #ddd;">Ter</th>
-                        <th style="padding: 10px; border: 1px solid #ddd;">Qua</th>
-                        <th style="padding: 10px; border: 1px solid #ddd;">Qui</th>
-                        <th style="padding: 10px; border: 1px solid #ddd;">Sex</th>
-                        <th style="padding: 10px; border: 1px solid #ddd;">Sáb</th>
-                        <th style="padding: 10px; border: 1px solid #ddd;">Dom</th>
-                    </tr>
-                `;
-                table.appendChild(thead);
-            
-                // Corpo da tabela
-                const shifts = ['morning', 'afternoon', 'evening'];
-                const shiftNames = {
-                    morning: 'Manhã',
-                    afternoon: 'Tarde',
-                    evening: 'Noite'
-                };
-            
-                shifts.forEach(shift => {
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `<td style="padding: 10px; border: 1px solid #ddd; font-weight: bold;">${shiftNames[shift]}</td>`;
-                    
-                    ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'].forEach(day => {
-                        const volunteer = volunteers.find(v => v.shift === shift && v.day === day);
-                        tr.innerHTML += `
-                            <td style="padding: 10px; border: 1px solid #ddd;">
-                                ${volunteer ? volunteer.name : '-'}
-                            </td>
-                        `;
-                    });
-                    
-                    table.appendChild(tr);
-                });
-            
-                // Montar relatório completo
-                tempDiv.appendChild(header);
-                tempDiv.appendChild(table);
-                document.body.appendChild(tempDiv);
-            
-                // Usar html2canvas para converter para imagem
-                html2canvas(tempDiv, {
-                    scale: 2, // Melhor qualidade
-                    backgroundColor: 'white'
-                }).then(canvas => {
-                    // Criar link de download
-                    const link = document.createElement('a');
-                    link.download = `escala-voluntarios-${new Date().toISOString().split('T')[0]}.png`;
-                    link.href = canvas.toDataURL('image/png');
-                    link.click();
-            
-                    // Limpar
-                    document.body.removeChild(tempDiv);
-                });
-            }
-            
-            // Adiciona eventos aos botões
-            addVolunteerBtns.forEach(btn => {
-                btn.addEventListener('click', handleAddVolunteer);
-            });
-            
-            cancelVolunteerBtn.addEventListener('click', function() {
-                volunteerForm.style.display = 'none';
-                currentCell = null;
-            });
-            
-            saveVolunteerBtn.addEventListener('click', saveVolunteer);
-            exportBtn.addEventListener('click', exportData);
-            
-            // Sistema de Tarefas
-            const shiftButtons = document.querySelectorAll('.shift-btn');
-            const shiftSections = document.querySelectorAll('.shift-section');
-            
-            shiftButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const shift = this.getAttribute('data-shift');
-                    
-                    shiftButtons.forEach(btn => btn.classList.remove('active'));
-                    shiftSections.forEach(section => section.classList.remove('active'));
-                    
-                    this.classList.add('active');
-                    document.querySelector(`.shift-section.${shift}`).classList.add('active');
-                    updateProgress();
-                });
-            });
-            
-            // Mostrar/ocultar fotos
-            const photoButtons = document.querySelectorAll('.photo-btn');
-            photoButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const container = this.nextElementSibling;
-                    container.style.display = container.style.display === 'block' ? 'none' : 'block';
-                });
-            });
-            
-            // Tirar fotos (simulação)
-            const takePhotoButtons = document.querySelectorAll('.take-photo');
-            takePhotoButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const type = this.getAttribute('data-type');
-                    const preview = this.parentElement.querySelector('.photo-preview');
-                    
-                    // Em um app real, aqui você chamaria a API da câmera
-                    preview.innerHTML = `<img src="https://via.placeholder.com/300x150?text=Foto+${type === 'before' ? 'Antes' : 'Depois'}" alt="Foto ${type === 'before' ? 'Antes' : 'Depois'}">`;
-                });
-            });
-            
-            // Atualizar progresso
-            const checkboxes = document.querySelectorAll('.task-checkbox');
-            checkboxes.forEach(checkbox => {
-                checkbox.addEventListener('change', function() {
-                    const taskItem = this.closest('.task-item');
-                    if (this.checked) {
-                        taskItem.classList.add('task-completed');
-                    } else {
-                        taskItem.classList.remove('task-completed');
-                    }
-                    updateProgress();
-                });
-            });
-            
-            function updateProgress() {
-                const activeSection = document.querySelector('.shift-section.active');
-                if (!activeSection) return;
-                
-                const tasks = activeSection.querySelectorAll('.task-item');
-                const completedTasks = activeSection.querySelectorAll('.task-completed');
-                
-                const progress = (completedTasks.length / tasks.length) * 100;
-                document.querySelector('.progress').style.width = `${progress}%`;
-                document.querySelector('.progress-text').textContent = `${Math.round(progress)}% completo`;
-            }
-            
-            // Botão Salvar Progresso
-            document.getElementById('save-progress-btn').addEventListener('click', function() {
-                const activeSection = document.querySelector('.shift-section.active');
-                if (!activeSection) return;
+<script>
+  document.getElementById('testeLeitura').addEventListener('click', () => {
+    database.ref('tarefas').once('value')
+      .then(snap => alert("Dados: " + JSON.stringify(snap.val())));
+  });
 
-                const volunteerName = prompt("Nome do voluntário:");
-                if (!volunteerName) {
-                    alert("Por favor, informe seu nome!");
-                    return;
-                }
-
-                const cashAmount = prompt("Valor em caixa (R$):");
-                if (!cashAmount) {
-                    alert("Por favor, informe o valor em caixa!");
-                    return;
-                }
-
-                const inventoryStatus = confirm("Inventário está OK?") ? "✅ OK" : "⚠️ Pendente";
-                const observations = document.getElementById('shift-observations').value.trim();
-
-                const turnName = activeSection.querySelector('h2').textContent;
-                const tasks = activeSection.querySelectorAll('.task-item');
-                const completedTasks = Array.from(tasks).filter(task => 
-                    task.querySelector('.task-checkbox').checked
-                );
-                const progress = Math.round((completedTasks.length / tasks.length) * 100);
-
-                // Criar mensagem formatada
-                let message = `*📋 Relatório de Tarefas - ${turnName}*\n`;
-                message += `📅 Data: ${new Date().toLocaleDateString('pt-BR')}\n`;
-                message += `⏰ Horário: ${new Date().toLocaleTimeString('pt-BR')}\n\n`;
-                message += `👤 Voluntário: ${volunteerName}\n`;
-                message += `💰 Caixa: R$ ${Number(cashAmount.replace(',', '.')).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}\n`;
-                message += `📦 Inventário: ${inventoryStatus}\n\n`;
-
-                // Adicionar movimentos de quartos se houver
-                const movements = document.querySelectorAll('.movement-item');
-                if (movements.length > 0) {
-                    message += `*🔄 Check-ins/Check-outs:*\n`;
-                    movements.forEach(movement => {
-                        const text = movement.querySelector('span').textContent;
-                        message += `• ${text}\n`;
-                    });
-                    message += '\n';
-                }
-
-                // Adicionar tarefas concluídas
-                message += `*✅ Tarefas Concluídas:*\n`;
-                completedTasks.forEach(task => {
-                    const text = task.querySelector('.task-text').textContent;
-                    const shortText = taskShortNames[text] || text;
-                    message += `${shortText}\n`;
-                });
-
-                // Adicionar observações se houver (incluindo justificativas para tarefas não realizadas)
-                if (observations) {
-                    message += `\n*📝 Observações/Justificativas:*\n${observations}\n`;
-                }
-
-                // Copiar para área de transferência
-                try {
-                    navigator.clipboard.writeText(message).then(() => {
-                        alert('Relatório copiado! Cole no WhatsApp.');
-                    });
-                } catch (err) {
-                    const tempTextArea = document.createElement('textarea');
-                    tempTextArea.value = message;
-                    document.body.appendChild(tempTextArea);
-                    tempTextArea.select();
-                    document.execCommand('copy');
-                    document.body.removeChild(tempTextArea);
-                    alert('Relatório copiado! Cole no WhatsApp.');
-                }
-
-                // Limpar observações após enviar
-                document.getElementById('shift-observations').value = '';
-
-                // Salvar estado
-                localStorage.setItem('lastTaskState', JSON.stringify({
-                    date: new Date().toISOString(),
-                    volunteer: volunteerName,
-                    cashAmount: cashAmount,
-                    shift: turnName,
-                    progress: progress,
-                    tasks: Array.from(tasks).map(task => ({
-                        text: task.querySelector('.task-text').textContent,
-                        completed: task.querySelector('.task-checkbox').checked
-                    }))
-                }));
-            });
-
-            // Adicione este código para os botões de turno
-            document.querySelectorAll('.shift-btn').forEach(button => {
-                button.addEventListener('click', function() {
-                    const shift = this.dataset.shift;
-                    
-                    // Remover active de todos os botões e seções
-                    document.querySelectorAll('.shift-btn').forEach(btn => 
-                        btn.classList.remove('active')
-                    );
-                    document.querySelectorAll('.shift-section').forEach(section => 
-                        section.classList.remove('active')
-                    );
-                    
-                    // Adicionar active ao botão e seção clicados
-                    this.classList.add('active');
-                    document.querySelector(`.shift-section.${shift}`).classList.add('active');
-                    
-                    // Atualizar barra de progresso
-                    updateProgress();
-                });
-            });
-
-            // Função para atualizar o progresso
-            function updateProgress() {
-                const activeSection = document.querySelector('.shift-section.active');
-                if (!activeSection) return;
-                
-                const tasks = activeSection.querySelectorAll('.task-item');
-                const completedTasks = activeSection.querySelectorAll('.task-checkbox:checked').length;
-                const progress = Math.round((completedTasks / tasks.length) * 100);
-                
-                document.querySelector('.progress').style.width = progress + '%';
-                document.querySelector('.progress-text').textContent = progress + '% completo';
-            }
-
-            // Adicionar evento de change para os checkboxes
-            document.querySelectorAll('.task-checkbox').forEach(checkbox => {
-                checkbox.addEventListener('change', function() {
-                    const taskItem = this.closest('.task-item');
-                    if (this.checked) {
-                        taskItem.classList.add('task-completed');
-                    } else {
-                        taskItem.classList.remove('task-completed');
-                    }
-                    updateProgress();
-                });
-            });
-            
-            // Carregar estado salvo das tarefas
-            try {
-                const savedState = localStorage.getItem('lastTaskState');
-                if (savedState) {
-                    const state = JSON.parse(savedState);
-                    const savedDate = new Date(state.date);
-                    const today = new Date();
-        
-                    // Só restaura se for do mesmo dia
-                    if (savedDate.toDateString() === today.toDateString()) {
-                        state.tasks.forEach(savedTask => {
-                            const taskElement = Array.from(document.querySelectorAll('.task-text'))
-                                .find(el => el.textContent === savedTask.text);
-                            if (taskElement) {
-                                const checkbox = taskElement.parentElement.querySelector('.task-checkbox');
-                                checkbox.checked = savedTask.completed;
-                                if (savedTask.completed) {
-                                    taskElement.parentElement.classList.add('task-completed');
-                                }
-                            }
-                        });
-                        updateProgress();
-                    } else {
-                        // Limpar dados antigos
-                        localStorage.removeItem('lastTaskState');
-                    }
-                }
-            } catch (err) {
-                console.error('Erro ao carregar estado salvo:', err);
-            }
-            
-            // Inicialização
-            updateWeekDisplay();
-            document.querySelector('.shift-btn[data-shift="morning"]').click();
-        });
-
-        const taskShortNames = {
-            // Tarefas Gerais (Para todos os turnos)
-            "Completar todos os checklists da recepção (avise o próximo voluntário caso não consiga terminar alguma atividade)": "• Checklist da recepção completo ✅",
-            "Vender produtos da recepção e receber pagamentos na hora para não criar dívidas": "• Vendas da recepção realizadas ✅",
-            "Passar perfume e ligar a luminária dos quartos com Check-in ao menos 30 minutos antes da chegada": "• Quartos preparados para check-in ✅",
-            "Ficar sempre com o fone da recepção (utilizar a bolsa preta)": "• Telefone na bolsa em uso ✅",
-            "Usar Resear como produto nos vidros dos boxes dos banheiros": "• Boxes dos banheiros limpos ✅",
-            "Manter arrumado o sofá da sala e mesas da sala de alimentação": "• Sala de alimentação organizada ✅",
-            "Em caso de dúvida no check-in, verificar a lista atrás do computador ou avisos na bancada": "• Avisos do check-in verificados ✅",
-
-            // Tarefas Manhã (7:30-13:00)
-            "Enviar mensagem no grupo STAFF de abertura de turno": "• Mensagem de abertura enviada ✅",
-            "Abrir a porta da recepção e o terraço (7:30-10:00)": "• Portas e terraço abertos ✅",
-            "Fazer o café e colocar bolachas e itens na bancada": "• Café e bolachas servidos ✅",
-            "Guardar tudo ao meio dia (encher o pote de bolachas antes)": "• Café e bolachas guardados ✅",
-            "Ligar o computador da sala e colocar música ambiente em volume baixo": "• Música ambiente ligada ✅",
-            "Varrer a área da frente, dos fundos e terraço (molhar as plantas)": "• Áreas varridas e plantas regadas ✅",
-            "Fazer login no sistema, verificar check-ins e check-outs do dia": "• Sistema verificado e atualizado ✅",
-            "Abrir o POS (abrir caixa) para contar dinheiro e fazer inventário dos produtos": "• Caixa aberto e contado ✅",
-            "Verificar caixinha do \"Check-out Express\" antes de subir para os quartos": "• Check-out Express verificado ✅",
-            "Limpar ou enxugar os banheiros (boxes, lixos, repor papel)": "• Banheiros limpos e organizados ✅",
-            "Abrir quartos sem hóspedes para arejar (verificar se precisa organizar/limpar)": "• Quartos arejados e verificados ✅",
-            "Retirar lençóis dos quartos de check-out que saírem antes das 11h": "• Lençóis dos check-outs retirados ✅",
-            "Passar pano com álcool nas mesas do refeitório e balcão": "• Mesas higienizadas ✅",
-            "Varrer os tapetes de entrada, da cozinha e dos banheiros": "• Tapetes varridos e limpos ✅",
-            "Lavar no tanque os panos de limpeza usados e pendurar na varanda": "• Panos de limpeza lavados ✅",
-            "Secar e guardar louças do escorredor": "• Louças secas e guardadas ✅",
-            "Encerrar o turno passando informações para o próximo voluntário": "• Informações passadas ao próximo ✅",
-            "Enviar relatório de encerramento no grupo STAFF (nº hóspedes, valor no caixa, recados)": "• Relatório final enviado ✅",
-            "Deslogar do POS e do sistema": "• Sistema e POS fechados ✅",
-
-            // Tarefas Tarde (13:00-18:00)
-            "Enviar mensagem no grupo STAFF (tarde)": "• Mensagem tarde enviada ✅",
-            "Verificar se os quartos que estão aguardando check-ins estão OK": "• Quartos de check-in verificados ✅",
-            "Varrer o corredor, escadas e piso do quarto compartilhado": "• Corredores e escadas limpos ✅",
-            "Verificar se precisa passar pano com produto no piso da sala e/ou cozinha": "• Pisos limpos com produto ✅",
-            "Ajudar na lavanderia com as roupas de cama quando necessário": "• Roupas de cama organizadas ✅",
-
-            // Tarefas Noite (18:00-23:30)
-            "Enviar mensagem no grupo STAFF (noite)": "• Mensagem noite enviada ✅",
-            "Juntar os lixos e retirar os sacos que estiverem na entrada (usar alarme às 19:00)": "• Lixo recolhido e retirado ✅",
-            "Verificar se os quartos que estão aguardando check-ins estão OK": "• Quartos de check-in verificados ✅",
-            "Encerrar o turno deixando informações para o próximo voluntário": "• Informações passadas ✅",
-
-            // Procedimentos de Fechamento
-            "Retirar o filtro da tomada e trancar o cadeado do escritório": "• Filtro desligado e escritório fechado ✅",
-            "Colocar máquinas de cartões, celular e fone sem fio do hostel para carregar": "• Equipamentos carregando ✅",
-            "Fazer a última contagem do caixa do dia": "• Caixa final conferido ✅",
-            "Verificar se o freezer de bebidas e o estoque de doces/diversos estão trancados": "• Freezer e estoque trancados ✅",
-            "Fechar com chave a porta da varanda (orientar hóspedes a fechar após o uso)": "• Porta da varanda trancada ✅",
-            "Desligar os computadores (colocar revistas sobre o computador da recepção)": "• Computadores desligados ✅",
-            "Apagar as luzes da recepção, cozinha e fundos": "• Luzes apagadas ✅",
-            "Guardar as chaves do hostel e do quadro de chaves na recepção": "• Chaves guardadas ✅",
-            "Virar a plaquinha da corrente para o lado \"fechado\" ao finalizar": "• Placa de fechado virada ✅"
-        };
-
-        // Adicione ao seu JavaScript existente
-        document.querySelectorAll('.movement-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                document.querySelectorAll('.movement-btn').forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-            });
-        });
-
-        document.getElementById('add-movement').addEventListener('click', function() {
-            const room = document.getElementById('room-select');
-            if (!room.value) {
-                alert('Selecione um quarto');
-                return;
-            }
-
-            const isCheckin = document.querySelector('.checkin-btn').classList.contains('active');
-            const type = isCheckin ? 'Check-in' : 'Check-out';
-            const roomText = room.options[room.selectedIndex].text;
-
-            const movementItem = document.createElement('div');
-            movementItem.className = `movement-item ${isCheckin ? 'checkin' : 'checkout'}`;
-            movementItem.innerHTML = `
-                <span>${type}: ${roomText}</span>
-                <button class="remove-movement" onclick="this.parentElement.remove()">×</button>
-            `;
-
-            document.querySelector('.movements-list').appendChild(movementItem);
-            room.value = '';
-        });
+        const firebaseConfig = {
+            apiKey: "AIzaSyC5tZN0Qz5B_PqyGDLk4vwqdTARPQm9kj0",
+            authDomain: "hostel-sp.firebaseapp.com",
+            projectId: "hostel-sp",
+            storageBucket: "hostel-sp.firebasestorage.app",
+            messagingSenderId: "1058972867746",
+            appId: "1:1058972867746:web:1f8b4aaaae64ceed7a8bfb",
+            measurementId: "G-5EXD9KED9P"
+          };
     </script>
+    <script src="script.js"></script>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-serializejson/2.9.0/jquery.serializejson.min.js"></script>
 </body>
 </html>
