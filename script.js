@@ -741,3 +741,35 @@ document.getElementById('add-movement').addEventListener('click', function() {
     document.querySelector('.movements-list').appendChild(movementItem);
     room.value = '';
 });
+// Adicione tratamento de erro para o Firebase
+database.ref('schedules').on('value', snapshot => {
+    // sucesso
+}, error => {
+    console.error("Erro Firebase:", error);
+    showErrorToast("Erro ao carregar dados");
+});
+
+// Função para mostrar erros
+function showErrorToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'error-toast';
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+}
+// Ao salvar dados
+function setLoading(loading) {
+    document.getElementById('save-volunteer').disabled = loading;
+    document.getElementById('save-volunteer').textContent = 
+        loading ? 'Salvando...' : 'Salvar';
+}
+
+// Exemplo de uso
+setLoading(true);
+database.ref('schedules').set(data)
+    .then(() => setLoading(false))
+    .catch(error => {
+        setLoading(false);
+        showErrorToast("Erro ao salvar");
+    });
+    

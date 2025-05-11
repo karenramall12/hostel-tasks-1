@@ -8,15 +8,14 @@
 
    
 </head>
+
 <!-- Adicione isso no <head> do seu HTML -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-<script>
-    // Teste rápido
-    database.ref('teste').set({ funcionando: true })
-      .then(() => alert('Banco de dados conectado! 🎉'));
-  </script>
+    <!-- Adicione no head -->
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 <body>
+    
     <div class="container">
         <header>
             <h1>Sistema Hostel</h1>
@@ -677,25 +676,9 @@
         
         <button class="save-btn" id="save-progress-btn">Salvar Progresso</button>
     </div>
-    <!-- No seu HTML (pode remover depois) -->
-<button id="testeLeitura">Testar Conexão</button>
 
-<script>
-  document.getElementById('testeLeitura').addEventListener('click', () => {
-    database.ref('tarefas').once('value')
-      .then(snap => alert("Dados: " + JSON.stringify(snap.val())));
-  });
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyC5tZN0Qz5B_PqyGDLk4vwqdTARPQm9kj0",
-            authDomain: "hostel-sp.firebaseapp.com",
-            projectId: "hostel-sp",
-            storageBucket: "hostel-sp.firebasestorage.app",
-            messagingSenderId: "1058972867746",
-            appId: "1:1058972867746:web:1f8b4aaaae64ceed7a8bfb",
-            measurementId: "G-5EXD9KED9P"
-          };
-    </script>
+    
     <script src="script.js"></script>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
