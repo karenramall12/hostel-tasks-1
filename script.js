@@ -500,17 +500,54 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
+    document.querySelectorAll('.task-item').forEach(item => {
+        item.addEventListener('click', function(e) {
+            // Evita duplo clique no checkbox
+            if (e.target.tagName.toLowerCase() !== 'input') {
+                const checkbox = item.querySelector('.task-checkbox');
+                checkbox.checked = !checkbox.checked;
+                checkbox.dispatchEvent(new Event('change'));
+            }
+        });
+    });
+    
     function updateProgress() {
-        const activeSection = document.querySelector('.shift-section.active');
-        if (!activeSection) return;
+        // Identifica qual turno está ativo
+        const activeShift = document.querySelector('.shift-section.active');
+        if (!activeShift) return;
+
+        // Conta apenas as checkboxes do turno ativo
+        const checkboxes = activeShift.querySelectorAll('.task-checkbox');
+        const checked = activeShift.querySelectorAll('.task-checkbox:checked');
         
-        const tasks = activeSection.querySelectorAll('.task-item');
-        const completedTasks = activeSection.querySelectorAll('.task-completed');
-        
-        const progress = (completedTasks.length / tasks.length) * 100;
-        document.querySelector('.progress').style.width = `${progress}%`;
-        document.querySelector('.progress-text').textContent = `${Math.round(progress)}% completo`;
+        if (checkboxes.length > 0) {
+            const percentage = (checked.length / checkboxes.length) * 100;
+            const progressBar = document.querySelector('.progress');
+            const progressText = document.querySelector('.progress-text');
+            
+            if (progressBar && progressText) {
+                progressBar.style.width = percentage + '%';
+                progressText.textContent = Math.round(percentage) + '% completo';
+            }
+        }
     }
+
+    // Atualiza o progresso quando trocar de turno
+    document.querySelectorAll('.shift-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            // Aguarda um momento para a troca de turno ser concluída
+            setTimeout(updateProgress, 100);
+        });
+    });
+    
+    // Atualiza quando marcar/desmarcar tarefas
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.task-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', updateProgress);
+        });
+        // Atualiza progresso inicial
+        updateProgress();
+    });
     
     // Botão Salvar Progresso
     document.getElementById('save-progress-btn').addEventListener('click', function() {
@@ -651,65 +688,188 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
+    // Voluntários no localStorage
+    function getVolunteers() {
+        return JSON.parse(localStorage.getItem('volunteers') || '[]');
+    }
+    function saveVolunteers(vols) {
+        localStorage.setItem('volunteers', JSON.stringify(vols));
+    }
+
+    // Cadastro de voluntário (apenas nome e cor)
+    document.getElementById('add-volunteer-btn').onclick = function() {
+        const name = document.getElementById('vol-name').value.trim();
+        const color = document.querySelector('input[name="vol-color"]:checked').value;
+        if (!name) return alert('Digite o nome do voluntário!');
+        const vols = JSON.parse(localStorage.getItem('volunteers') || '[]');
+        vols.push({ name, color });
+        localStorage.setItem('volunteers', JSON.stringify(vols));
+        document.getElementById('vol-name').value = '';
+        alert('Voluntário salvo!');
+    };
+
+    // Gerenciamento de Voluntários
+    class VolunteerManager {
+        constructor() {
+            this.volunteers = JSON.parse(localStorage.getItem('volunteers') || '[]');
+            this.setupEventListeners();
+            this.updateVolunteersList();
+        }
+
+        setupEventListeners() {
+            document.getElementById('save-volunteer-btn').addEventListener('click', () => {
+                this.addVolunteer();
+            });
+
+            // Permite usar Enter para salvar
+            document.getElementById('new-volunteer-name').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    this.addVolunteer();
+                }
+            });
+        }
+
+        addVolunteer() {
+            const nameInput = document.getElementById('new-volunteer-name');
+            const name = nameInput.value.trim();
+            const color = document.querySelector('input[name="volunteer-color"]:checked').value;
+
+            if (!name) {
+                alert('Por favor, digite o nome do voluntário');
+                return;
+            }
+
+            // Verifica se já existe
+            if (this.volunteers.some(v => v.name.toLowerCase() === name.toLowerCase())) {
+                alert('Este voluntário já está cadastrado');
+                return;
+            }
+
+            // Adiciona novo voluntário
+            this.volunteers.push({ name, color });
+            this.saveVolunteers();
+            this.updateVolunteersList();
+
+            // Limpa o campo
+            nameInput.value = '';
+            alert('Voluntário cadastrado com sucesso!');
+        }
+
+        removeVolunteer(index) {
+            if (confirm('Tem certeza que deseja remover este voluntário?')) {
+                this.volunteers.splice(index, 1);
+                this.saveVolunteers();
+                this.updateVolunteersList();
+            }
+        }
+
+        saveVolunteers() {
+            localStorage.setItem('volunteers', JSON.stringify(this.volunteers));
+        }
+
+        updateVolunteersList() {
+            const list = document.getElementById('volunteers-list');
+            list.innerHTML = '';
+
+            this.volunteers.forEach((volunteer, index) => {
+                const li = document.createElement('li');
+                li.style.backgroundColor = volunteer.color;
+                
+                li.innerHTML = `
+                    ${volunteer.name}
+                    <button class="remove-btn" onclick="volunteerManager.removeVolunteer(${index})">
+                        ✕
+                    </button>
+                `;
+                
+                list.appendChild(li);
+            });
+        }
+    }
+
+    // Inicializa o gerenciador quando a página carregar
+    document.addEventListener('DOMContentLoaded', () => {
+        window.volunteerManager = new VolunteerManager();
+    });
+    
     // Inicialização
     updateWeekDisplay();
     document.querySelector('.shift-btn[data-shift="morning"]').click();
 });
 
 const taskShortNames = {
-    // Tarefas Gerais (Para todos os turnos)
-    "Completar todos os checklists da recepção (avise o próximo voluntário caso não consiga terminar alguma atividade)": "• Checklist da recepção completo ✅",
-    "Vender produtos da recepção e receber pagamentos na hora para não criar dívidas": "• Vendas da recepção realizadas ✅",
-    "Passar perfume e ligar a luminária dos quartos com Check-in ao menos 30 minutos antes da chegada": "• Quartos preparados para check-in ✅",
-    "Ficar sempre com o fone da recepção (utilizar a bolsa preta)": "• Telefone na bolsa em uso ✅",
-    "Usar Resear como produto nos vidros dos boxes dos banheiros": "• Boxes dos banheiros limpos ✅",
-    "Manter arrumado o sofá da sala e mesas da sala de alimentação": "• Sala de alimentação organizada ✅",
-    "Em caso de dúvida no check-in, verificar a lista atrás do computador ou avisos na bancada": "• Avisos do check-in verificados ✅",
+    // Gerais
+    "Completar todos os checklists da recepção (avise o próximo voluntário caso não consiga terminar alguma atividade)": "• Checklist recepção ✅",
+    "Vender produtos da recepção e receber pagamentos na hora para não criar dívidas": "• Produtos pagos ✅",
+    "Passar perfume e ligar a luminária dos quartos com Check-in ao menos 30 minutos antes da chegada": "• Quartos perfumados ✅",
+    "Ficar sempre com o fone da recepção (utilizar a bolsa preta)": "• Fone da recepção ✅",
+    "Usar Resear como produto nos vidros dos boxes dos banheiros": "• Vidros dos boxes limpos ✅",
+    "Manter arrumado o sofá da sala e mesas da sala de alimentação": "• Sofá e mesas arrumados ✅",
+    "Em caso de dúvida no check-in, verificar a lista atrás do computador ou avisos na bancada": "• Check-in verificado ✅",
 
-    // Tarefas Manhã (7:30-13:00)
-    "Enviar mensagem no grupo STAFF de abertura de turno": "• Mensagem de abertura enviada ✅",
-    "Abrir a porta da recepção e o terraço (7:30-10:00)": "• Portas e terraço abertos ✅",
-    "Fazer o café e colocar bolachas e itens na bancada": "• Café e bolachas servidos ✅",
-    "Guardar tudo ao meio dia (encher o pote de bolachas antes)": "• Café e bolachas guardados ✅",
-    "Ligar o computador da sala e colocar música ambiente em volume baixo": "• Música ambiente ligada ✅",
-    "Varrer a área da frente, dos fundos e terraço (molhar as plantas)": "• Áreas varridas e plantas regadas ✅",
-    "Fazer login no sistema, verificar check-ins e check-outs do dia": "• Sistema verificado e atualizado ✅",
-    "Abrir o POS (abrir caixa) para contar dinheiro e fazer inventário dos produtos": "• Caixa aberto e contado ✅",
-    "Verificar caixinha do \"Check-out Express\" antes de subir para os quartos": "• Check-out Express verificado ✅",
-    "Limpar ou enxugar os banheiros (boxes, lixos, repor papel)": "• Banheiros limpos e organizados ✅",
-    "Abrir quartos sem hóspedes para arejar (verificar se precisa organizar/limpar)": "• Quartos arejados e verificados ✅",
-    "Retirar lençóis dos quartos de check-out que saírem antes das 11h": "• Lençóis dos check-outs retirados ✅",
-    "Passar pano com álcool nas mesas do refeitório e balcão": "• Mesas higienizadas ✅",
-    "Varrer os tapetes de entrada, da cozinha e dos banheiros": "• Tapetes varridos e limpos ✅",
-    "Lavar no tanque os panos de limpeza usados e pendurar na varanda": "• Panos de limpeza lavados ✅",
-    "Secar e guardar louças do escorredor": "• Louças secas e guardadas ✅",
-    "Encerrar o turno passando informações para o próximo voluntário": "• Informações passadas ao próximo ✅",
-    "Enviar relatório de encerramento no grupo STAFF (nº hóspedes, valor no caixa, recados)": "• Relatório final enviado ✅",
-    "Deslogar do POS e do sistema": "• Sistema e POS fechados ✅",
+    // Manhã
+    "Abertura de Turno (Mensagem no grupo)": "• Abertura de turno ✅",
+    "Fazer Login do sistema, verificar Check-ins e Check-outs do dia": "• Sistema verificado ✅",
+    "Abrir o POS (abrir caixa) para contar dinheiro": "• Caixa aberto ✅",
+    "Abrir a Porta da Recepção e do Terraço para arejar": "• Portas abertas ✅",
+    "Ligar o computador da sala (deixar na tela o site do Hostel)": "• Computador ligado ✅",
+    "Colocar música ambiente pelo celular (Bluethooth) em volume baixo": "• Música ligada ✅",
+    "Guardar Louças que estiverem no Escorredor": "• Louças guardadas ✅",
+    "Fazer o Café, colocar Pote de Bolachas e Açucar na bancada": "• Café preparado ✅",
+    "Oferecer um cafezinho aos nossos Hóspedes": "• Café oferecido ✅",
+    "Vasos sanitários (utilizar a escova própria com desinfetante)": "• Vasos limpos ✅",
+    "Esvaziar os cestos de lixos": "• Lixos esvaziados ✅",
+    "Varrer tapetes do banheiro e/ou trocar toalhas de piso, se necessário": "• Tapetes/toalhas ok ✅",
+    "Pias e torneiras (Enxugar ou limpar com pano de microfibra)": "• Pias/torneiras limpas ✅",
+    "Piso do Box (retirar cabelos e limpar com detergente)": "• Box limpo ✅",
+    "Passar nos Vidros dos Boxes, Espelhos e Torneiras o pano de Microfibra": "• Vidros/espelhos limpos ✅",
+    "Piso do Banheiro – (Passar pano com desinfetante)": "• Piso banheiro limpo ✅",
+    "Retirar os itens esquecidos nos banheiros e deixar na salinha enviando fotos avisando o grupo": "• Achados/Perdidos ok ✅",
+    "Varrer ou Enxugar a área da Frente, dos Fundos e Terraço": "• Áreas externas limpas ✅",
+    "Molhar as Plantas da Entrada, Fundos e do Terraço": "• Plantas regadas ✅",
+    "Retirar Lixos que estiverem cheios e trocar o saco": "• Lixos trocados ✅",
+    "Verificar caixinha do “Check-out Express” antes de subir para os Quartos": "• Check-out Express ok ✅",
+    "Verificar se os Quartos com previsão de Check-ins estão limpos e arrumados": "• Quartos check-in ok ✅",
+    "Fazer limpeza e arrumação dos quartos que já fizeram Check-out": "• Quartos check-out limpos ✅",
+    "Pano com álcool nas mesas do refeitório, Balcão e limpar o Fogão": "• Mesas/balcão/fogão limpos ✅",
+    "Varrer os tapetes de Entrada, da Cozinha e dos Fundos": "• Tapetes limpos ✅",
+    "Localizar Hóspede. Ficarão um pouco mais (1h) e/ou desejam Meia diária": "• Hóspedes localizados ✅",
+    "Retirar o Café, Açucar, encher o pote de bolachas antes de guardar": "• Café/bolachas guardados ✅",
+    "Secar e guardar louças dos Hóspedes deixadas no Escorredor": "• Louças hóspedes guardadas ✅",
+    "Arrumação e Limpeza dos Quartos que tiveram Check-outs": "• Quartos arrumados ✅",
+    "Mesmas atividades das 7h45. (VIDE ATIVIDADES ACIMA)": "• Segunda limpeza banheiros ✅",
+    "Lavar os panos de limpeza que utilizou após o uso e pendurar na varanda": "• Panos lavados ✅",
+    "Manter o cesto com produtos de Limpeza e os Panos do armario da Lavanderia organizados": "• Produtos/panos organizados ✅",
+    "Fazer a contagem do Inventário junto com o próximo voluntário": "• Inventário contado ✅",
+    "Fechar os quartos que estavam abertos para arejar": "• Quartos fechados ✅",
+    "Passar informações ou Recados ao próximo Voluntário": "• Informações passadas ✅",
+    "Deslogar do POS e do Sistema": "• Sistema deslogado ✅",
 
-    // Tarefas Tarde (13:00-18:00)
-    "Enviar mensagem no grupo STAFF (tarde)": "• Mensagem tarde enviada ✅",
-    "Verificar se os quartos que estão aguardando check-ins estão OK": "• Quartos de check-in verificados ✅",
-    "Varrer o corredor, escadas e piso do quarto compartilhado": "• Corredores e escadas limpos ✅",
-    "Verificar se precisa passar pano com produto no piso da sala e/ou cozinha": "• Pisos limpos com produto ✅",
-    "Ajudar na lavanderia com as roupas de cama quando necessário": "• Roupas de cama organizadas ✅",
+    // Tarde
+    "Fazer Login no Sistema, verificar Check-ins e Check-outs do dia": "• Sistema verificado ✅",
+    "Varrer ou passar rodo na área da frente, dos Fundos e Terraço": "• Áreas externas limpas ✅",
+    "Varrer o Corredor dos Quartos Privativos, Piso do Quarto compartilhado e Escadas": "• Corredor/quartos/escadas limpos ✅",
+    "Verificar se precisa passar um pano com produto no piso da Sala e/ou Cozinha": "• Piso sala/cozinha limpo ✅",
+    "Varrer os tapetes de Entrada, da Cozinha e dos Banheiros com vassoura": "• Tapetes limpos ✅",
+    "Secar e guardar louças dos Hóspedes deixadas no escorredor": "• Louças hóspedes guardadas ✅",
+    "Mesmas atividades das 13h30. (VIDE ATIVIDADES ACIMA)": "• Segunda limpeza banheiros ✅",
 
-    // Tarefas Noite (18:00-23:30)
-    "Enviar mensagem no grupo STAFF (noite)": "• Mensagem noite enviada ✅",
-    "Juntar os lixos e retirar os sacos que estiverem na entrada (usar alarme às 19:00)": "• Lixo recolhido e retirado ✅",
-    "Verificar se os quartos que estão aguardando check-ins estão OK": "• Quartos de check-in verificados ✅",
-    "Encerrar o turno deixando informações para o próximo voluntário": "• Informações passadas ✅",
-
-    // Procedimentos de Fechamento
-    "Retirar o filtro da tomada e trancar o cadeado do escritório": "• Filtro desligado e escritório fechado ✅",
-    "Colocar máquinas de cartões, celular e fone sem fio do hostel para carregar": "• Equipamentos carregando ✅",
-    "Fazer a última contagem do caixa do dia": "• Caixa final conferido ✅",
-    "Verificar se o freezer de bebidas e o estoque de doces/diversos estão trancados": "• Freezer e estoque trancados ✅",
-    "Fechar com chave a porta da varanda (orientar hóspedes a fechar após o uso)": "• Porta da varanda trancada ✅",
-    "Desligar os computadores (colocar revistas sobre o computador da recepção)": "• Computadores desligados ✅",
-    "Apagar as luzes da recepção, cozinha e fundos": "• Luzes apagadas ✅",
-    "Guardar as chaves do hostel e do quadro de chaves na recepção": "• Chaves guardadas ✅",
-    "Virar a plaquinha da corrente para o lado \"fechado\" ao finalizar": "• Placa de fechado virada ✅"
+    // Noite
+    "Fazer Login no sistema, verificar Check-ins e Check-outs do dia": "• Sistema verificado ✅",
+    "Verificar se os Quartos que estão aguardando Check-ins estão “Ok”": "• Quartos aguardando check-in ok ✅",
+    "Colocar sacos de Lixos que estiverem no Cesto Preto da entrata na rua para coleta": "• Lixo para coleta ✅",
+    "Aguardar os hóspedes dos Check-ins que constam no Sistema": "• Check-ins aguardados ✅",
+    "Mesmas atividades das 19H45. (VIDE ATIVIDADES ACIMA)": "• Segunda limpeza banheiros ✅",
+    "Verificar e Informar no grupo Staff se ainda há Hóspede que não realizou o Checkin": "• Check-in pendente informado ✅",
+    "Secar e guardar as louças deixadas pelos Hóspedes no Escorredor": "• Louças hóspedes guardadas ✅",
+    "Verificar se o freezer de bebidas e o estoque dos doces/diversos estão trancados": "• Freezer/estoque trancados ✅",
+    "Trancar a Porta da Varanda (caso tenha hóspede, orientá-lo a fechar após o uso)": "• Porta da varanda trancada ✅",
+    "Desligar os 2 computadores (coloque as revistas por cima do notebook e apague a luz da luminária)": "• Computadores desligados ✅",
+    "Apagar as Luzes da Recepção e Luzes decorativas do balcão da cozinha": "• Luzes apagadas ✅",
+    "Vire a plaquinha da corrente para o lado “fechado” ao finalizar o turno": "• Plaquinha virada ✅",
+    "Verificar se as máquinas de cartões e celular da Recepção estão carregando": "• Máquinas/celular carregando ✅",
+    "Colocar o fone sem Fio do Hostel na base para carregar": "• Fone carregando ✅",
+    "Guardar o molho de chaves do Hostel no local combinado": "• Chaves guardadas ✅"
 };
 
 // Adicione ao seu JavaScript existente
@@ -772,4 +932,156 @@ database.ref('schedules').set(data)
         setLoading(false);
         showErrorToast("Erro ao salvar");
     });
-    
+
+const defaultTasks = {
+    general: [
+        "Completar todos os checklists da recepção (avise o próximo voluntário caso não consiga terminar alguma atividade)",
+        "Vender produtos da recepção e receber pagamentos na hora para não criar dívidas"
+    ],
+    morning: [
+        "Abertura de Turno (Mensagem no grupo)",
+        "Fazer Login do sistema, verificar Check-ins e Check-outs do dia"
+    ],
+    afternoon: [
+        "Abertura de Turno (Mensagem no grupo)"
+    ],
+    evening: [
+        "Abertura de Turno (Mensagem no grupo)"
+    ]
+};
+
+function getTasks() {
+    return JSON.parse(localStorage.getItem('editTasks')) || defaultTasks;
+}
+
+function saveTasks(tasks) {
+    localStorage.setItem('editTasks', JSON.stringify(tasks));
+}
+
+function renderTaskEditor(shift = 'general') {
+    const tasks = getTasks();
+    const list = document.getElementById('edit-task-list');
+    list.innerHTML = '';
+    (tasks[shift] || []).forEach((task, idx) => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+            <input type="text" class="edit-task-input" value="${task}">
+            <button class="remove-task-btn" data-idx="${idx}">Remover</button>
+        `;
+        list.appendChild(li);
+    });
+}
+
+let currentEditorShift = 'general';
+
+document.querySelectorAll('.editor-tab-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.editor-tab-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        currentEditorShift = this.dataset.shift;
+        renderTaskEditor(currentEditorShift);
+    });
+});
+
+document.getElementById('add-task-btn').onclick = function() {
+    const input = document.getElementById('new-task-input');
+    const value = input.value.trim();
+    if (!value) return;
+    const tasks = getTasks();
+    tasks[currentEditorShift] = tasks[currentEditorShift] || [];
+    tasks[currentEditorShift].push(value);
+    saveTasks(tasks);
+    input.value = '';
+    renderTaskEditor(currentEditorShift);
+};
+
+document.getElementById('edit-task-list').onclick = function(e) {
+    if (e.target.classList.contains('remove-task-btn')) {
+        const idx = e.target.dataset.idx;
+        const tasks = getTasks();
+        tasks[currentEditorShift].splice(idx, 1);
+        saveTasks(tasks);
+        renderTaskEditor(currentEditorShift);
+    }
+};
+
+document.getElementById('save-tasks-btn').onclick = function() {
+    const tasks = getTasks();
+    const inputs = document.querySelectorAll('.edit-task-input');
+    tasks[currentEditorShift] = Array.from(inputs).map(input => input.value.trim()).filter(Boolean);
+    saveTasks(tasks);
+    alert('Tarefas salvas!');
+    renderTaskEditor(currentEditorShift);
+};
+
+// Inicialização
+renderTaskEditor(currentEditorShift);
+
+// Salvar voluntários no localStorage
+function getVolunteers() {
+    return JSON.parse(localStorage.getItem('volunteers') || '[]');
+}
+function saveVolunteers(vols) {
+    localStorage.setItem('volunteers', JSON.stringify(vols));
+}
+
+// Adicionar voluntário
+document.getElementById('add-volunteer-btn').onclick = function() {
+    const name = document.getElementById('vol-name').value.trim();
+    const color = document.querySelector('input[name="vol-color"]:checked').value;
+    if (!name) return alert('Digite o nome do voluntário!');
+    const vols = JSON.parse(localStorage.getItem('volunteers') || '[]');
+    vols.push({ name, color });
+    localStorage.setItem('volunteers', JSON.stringify(vols));
+    document.getElementById('vol-name').value = '';
+    alert('Voluntário salvo!');
+};
+
+// Abrir modal ao clicar no +
+document.querySelectorAll('.add-volunteer').forEach(btn => {
+    btn.onclick = function() {
+        const cell = this.closest('.schedule-cell');
+        showVolunteerModal(cell);
+    };
+});
+
+function showVolunteerModal(cell) {
+    const modal = document.getElementById('select-volunteer-modal');
+    const select = document.getElementById('volunteer-select');
+    const colorPicker = document.getElementById('volunteer-color-picker');
+    select.innerHTML = '';
+    const vols = getVolunteers();
+    vols.forEach((v, idx) => {
+        const opt = document.createElement('option');
+        opt.value = idx;
+        opt.textContent = v.name;
+        opt.style.background = v.color;
+        select.appendChild(opt);
+    });
+    // Atualiza cor ao trocar voluntário
+    select.onchange = function() {
+        colorPicker.value = vols[select.value]?.color || "#F47B20";
+    };
+    // Cor padrão do selecionado
+    colorPicker.value = vols[select.value]?.color || "#F47B20";
+    // Confirmar escolha
+    document.getElementById('confirm-volunteer').onclick = function() {
+        const v = vols[select.value];
+        if (!v) return;
+        let vlist = cell.querySelector('.volunteer-list-cell');
+        if (!vlist) {
+            vlist = document.createElement('div');
+            vlist.className = 'volunteer-list-cell';
+            cell.insertBefore(vlist, cell.querySelector('.add-volunteer'));
+        }
+        vlist.innerHTML = `<span class="volunteer-badge" style="background:${colorPicker.value};">${v.name}</span>`;
+        modal.style.display = 'none';
+    };
+    // Abrir modal
+    modal.style.display = 'flex';
+}
+
+// Fechar modal
+document.getElementById('close-modal').onclick = function() {
+    document.getElementById('select-volunteer-modal').style.display = 'none';
+};

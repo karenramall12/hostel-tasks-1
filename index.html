@@ -5,25 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema Hostel - Tarefas e Voluntários</title>
     <link rel="stylesheet" href="styles.css">
-
-   
-</head>
-
-<!-- Adicione isso no <head> do seu HTML -->
+    
+    <!-- Scripts do Firebase -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-    <!-- Adicione no head -->
-<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+</head>
+
 <body>
     
     <div class="container">
-        <header>
-            <h1>Sistema Hostel</h1>
-            <div class="auth-area">
-                <button class="auth-btn admin" id="admin-btn">Área Admin</button>
-                <button class="auth-btn" id="logout-btn">Sair</button>
-            </div>
-        </header>
+        <header class="header-clean">
+    <img src="logo.png" alt="Logo Hostelaria SP" class="logo-hostel">
+    <h1 class="titulo-laranja">Staff Hostelaria SP</h1>
+    <div class="auth-area">
+        <button class="auth-btn admin" id="admin-btn">Área Admin</button>
+        <button class="auth-btn" id="logout-btn">Sair</button>
+    </div>
+</header>
         
         <!-- Área Administrativa -->
         <div class="admin-panel" id="admin-panel">
@@ -145,32 +144,20 @@
             
             <!-- Formulário para adicionar/editar voluntário -->
             <div class="volunteer-form" id="volunteer-form">
-                <h3 id="form-title">Adicionar Voluntário</h3>
-                <div class="form-group">
-                    <label for="vol-name">Nome:</label>
-                    <input type="text" id="vol-name" placeholder="Nome completo do voluntário">
-                </div>
-                <div class="form-group">
-                    <label for="vol-phone">Telefone:</label>
-                    <input type="tel" id="vol-phone" placeholder="(00) 00000-0000">
-                </div>
-                <div class="form-group">
-                    <label for="vol-email">E-mail:</label>
-                    <input type="email" id="vol-email" placeholder="email@exemplo.com">
-                </div>
-                <div class="form-group">
-                    <label for="vol-shift">Turno:</label>
-                    <input type="text" id="vol-shift" readonly>
-                </div>
-                <div class="form-group">
-                    <label for="vol-day">Dia:</label>
-                    <input type="text" id="vol-day" readonly>
-                </div>
-                <div class="form-actions">
-                    <button class="form-btn cancel-btn" id="cancel-volunteer">Cancelar</button>
-                    <button class="form-btn save-btn" id="save-volunteer">Salvar</button>
-                </div>
-            </div>
+    <h3 id="form-title">Adicionar Voluntário</h3>
+    <div class="form-group">
+        <label for="vol-name">Nome:</label>
+        <input type="text" id="vol-name" placeholder="Nome do voluntário">
+    </div>
+    <div class="form-group">
+        <label for="vol-color">Cor do Voluntário:</label>
+        <input type="color" id="vol-color" value="#F47B20">
+    </div>
+    <div class="form-actions">
+        <button class="form-btn cancel-btn" id="cancel-volunteer">Cancelar</button>
+        <button class="form-btn save-btn" id="save-volunteer">Salvar</button>
+    </div>
+</div>
             
             <!-- Botão de exportar dados -->
             <button class="export-btn" id="export-btn">Exportar Dados dos Voluntários</button>
@@ -180,21 +167,30 @@
                 <h3>Todos os Voluntários</h3>
                 <!-- Lista será preenchida dinamicamente -->
             </div>
+            
+            <!-- Cadastro rápido de voluntário (apenas na área admin, logo abaixo do calendário) -->
+          
+    <button id="add-volunteer-btn" class="form-btn">Salvar</button>
+</div>
         </div>
         
         <!-- Sistema de Tarefas -->
         <div class="shift-selector">
-            <button class="shift-btn" data-shift="morning">Manhã</button>
-            <button class="shift-btn" data-shift="afternoon">Tarde</button>
-            <button class="shift-btn" data-shift="evening">Noite</button>
-        </div>
-        
-        <div class="progress-text">0% completo</div>
-        <div class="progress-bar">
-            <div class="progress"></div>
-        </div>
-        
-        <div class="shift-section general active">
+    <button class="shift-btn" data-shift="morning">Manhã</button>
+    <button class="shift-btn" data-shift="afternoon">Tarde</button>
+    <button class="shift-btn" data-shift="evening">Noite</button>
+</div>
+
+<!-- Barra de Progresso -->
+<div class="progress-container">
+    <div class="progress-text">0% completo</div>
+    <div class="progress-bar">
+        <div class="progress"></div>
+    </div>
+</div>
+
+<!-- Depois vêm as seções de tarefas -->
+<div class="shift-section general active">
             <h2>Observações Gerais (Todos os Turnos)</h2>
             <ul id="general-tasks">
                 <li class="task-item">
@@ -230,399 +226,224 @@
         
         <div class="shift-section morning">
             <h2>Turno da Manhã (7:30-13:00)</h2>
-            <div class="general-tasks">
-                <h3>Tarefas Gerais (Todos os Turnos)</h3>
-                <ul>
-                    <li class="task-item">
-                        <input type="checkbox" class="task-checkbox">
-                        <span class="task-text">Completar todos os checklists da recepção (avise o próximo voluntário caso não consiga terminar alguma atividade)</span>
-                    </li>
-                    <li class="task-item">
-                        <input type="checkbox" class="task-checkbox">
-                        <span class="task-text">Vender produtos da recepção e receber pagamentos na hora para não criar dívidas</span>
-                    </li>
-                    <li class="task-item">
-                        <input type="checkbox" class="task-checkbox">
-                        <span class="task-text">Passar perfume e ligar a luminária dos quartos com Check-in ao menos 30 minutos antes da chegada</span>
-                    </li>
-                    <li class="task-item">
-                        <input type="checkbox" class="task-checkbox">
-                        <span class="task-text">Ficar sempre com o fone da recepção (utilizar a bolsa preta)</span>
-                    </li>
-                    <li class="task-item">
-                        <input type="checkbox" class="task-checkbox">
-                        <span class="task-text">Usar Resear como produto nos vidros dos boxes dos banheiros</span>
-                    </li>
-                    <li class="task-item">
-                        <input type="checkbox" class="task-checkbox">
-                        <span class="task-text">Manter arrumado o sofá da sala e mesas da sala de alimentação</span>
-                    </li>
-                    <li class="task-item">
-                        <input type="checkbox" class="task-checkbox">
-                        <span class="task-text">Em caso de dúvida no check-in, verificar a lista atrás do computador ou avisos na bancada</span>
-                    </li>
-                </ul>
-            </div>
-            <hr class="task-divider">
-            <ul id="morning-tasks">
-                <li class="task-item">
-                    <input type="checkbox" class="task-checkbox">
-                    <span class="task-text">Enviar mensagem no grupo STAFF de abertura de turno</span>
-                </li>
-                <li class="task-item">
-                    <input type="checkbox" class="task-checkbox">
-                    <span class="task-text">Abrir a porta da recepção e o terraço (7:30-10:00)</span>
-                </li>
-                <li class="task-item">
-                    <input type="checkbox" class="task-checkbox">
-                    <span class="task-text">Fazer o café e colocar bolachas e itens na bancada</span>
-                    <button class="photo-btn">Fotos</button>
-                    <div class="photo-container">
-                        <div class="photo-wrapper">
-                            <div class="photo-box">
-                                <div class="photo-preview">Antes</div>
-                                <button class="take-photo" data-type="before">Tirar Foto Antes</button>
-                            </div>
-                            <div class="photo-box">
-                                <div class="photo-preview">Depois</div>
-                                <button class="take-photo" data-type="after">Tirar Foto Depois</button>
-                            </div>
-                        </div>
-                    </div>
-                </li>
-                <li class="task-item">
-                    <input type="checkbox" class="task-checkbox">
-                    <span class="task-text">Guardar tudo ao meio dia (encher o pote de bolachas antes)</span>
-                </li>
-                <li class="task-item">
-                    <input type="checkbox" class="task-checkbox">
-                    <span class="task-text">Ligar o computador da sala e colocar música ambiente em volume baixo</span>
-                </li>
-                <li class="task-item">
-                    <input type="checkbox" class="task-checkbox">
-                    <span class="task-text">Varrer a área da frente, dos fundos e terraço (molhar as plantas)</span>
-                </li>
-                <li class="task-item">
-                    <input type="checkbox" class="task-checkbox">
-                    <span class="task-text">Fazer login no sistema, verificar check-ins e check-outs do dia</span>
-                </li>
-                <li class="task-item">
-                    <input type="checkbox" class="task-checkbox">
-                    <span class="task-text">Abrir o POS (abrir caixa) para contar dinheiro e fazer inventário dos produtos</span>
-                </li>
-                <li class="task-item">
-                    <input type="checkbox" class="task-checkbox">
-                    <span class="task-text">Verificar caixinha do "Check-out Express" antes de subir para os quartos</span>
-                </li>
-                <li class="task-item">
-                    <input type="checkbox" class="task-checkbox">
-                    <span class="task-text">Limpar ou enxugar os banheiros (boxes, lixos, repor papel)</span>
-                    <button class="photo-btn">Fotos</button>
-                    <div class="photo-container">
-                        <div class="photo-wrapper">
-                            <div class="photo-box">
-                                <div class="photo-preview">Antes</div>
-                                <button class="take-photo" data-type="before">Tirar Foto Antes</button>
-                            </div>
-                            <div class="photo-box">
-                                <div class="photo-preview">Depois</div>
-                                <button class="take-photo" data-type="after">Tirar Foto Depois</button>
-                            </div>
-                        </div>
-                    </div>
-                </li>
-                <li class="task-item">
-                    <input type="checkbox" class="task-checkbox">
-                    <span class="task-text">Abrir quartos sem hóspedes para arejar (verificar se precisa organizar/limpar)</span>
-                </li>
-                <li class="task-item">
-                    <input type="checkbox" class="task-checkbox">
-                    <span class="task-text">Retirar lençóis dos quartos de check-out que saírem antes das 11h</span>
-                </li>
-                <li class="task-item">
-                    <input type="checkbox" class="task-checkbox">
-                    <span class="task-text">Passar pano com álcool nas mesas do refeitório e balcão</span>
-                </li>
-                <li class="task-item">
-                    <input type="checkbox" class="task-checkbox">
-                    <span class="task-text">Varrer os tapetes de entrada, da cozinha e dos banheiros</span>
-                </li>
-                <li class="task-item">
-                    <input type="checkbox" class="task-checkbox">
-                    <span class="task-text">Lavar no tanque os panos de limpeza usados e pendurar na varanda</span>
-                </li>
-                <li class="task-item">
-                    <input type="checkbox" class="task-checkbox">
-                    <span class="task-text">Secar e guardar louças do escorredor</span>
-                </li>
-                <li class="task-item">
-                    <input type="checkbox" class="task-checkbox">
-                    <span class="task-text">Encerrar o turno passando informações para o próximo voluntário</span>
-                </li>
-                <li class="task-item">
-                    <input type="checkbox" class="task-checkbox">
-                    <span class="task-text">Enviar relatório de encerramento no grupo STAFF (nº hóspedes, valor no caixa, recados)</span>
-                </li>
-                <li class="task-item">
-                    <input type="checkbox" class="task-checkbox">
-                    <span class="task-text">Deslogar do POS e do sistema</span>
-                </li>
-            </ul>
-        </div>
-        
-        <div class="shift-section afternoon">
-            <h2>Turno da Tarde</h2>
-            <div class="general-tasks">
-                <h3>Tarefas Gerais (Todos os Turnos)</h3>
-                <ul>
-                    <li class="task-item">
-                        <input type="checkbox" class="task-checkbox">
-                        <span class="task-text">Completar todos os checklists da recepção (avise o próximo voluntário caso não consiga terminar alguma atividade)</span>
-                    </li>
-                    <li class="task-item">
-                        <input type="checkbox" class="task-checkbox">
-                        <span class="task-text">Vender produtos da recepção e receber pagamentos na hora para não criar dívidas</span>
-                    </li>
-                    <li class="task-item">
-                        <input type="checkbox" class="task-checkbox">
-                        <span class="task-text">Passar perfume e ligar a luminária dos quartos com Check-in ao menos 30 minutos antes da chegada</span>
-                    </li>
-                    <li class="task-item">
-                        <input type="checkbox" class="task-checkbox">
-                        <span class="task-text">Ficar sempre com o fone da recepção (utilizar a bolsa preta)</span>
-                    </li>
-                    <li class="task-item">
-                        <input type="checkbox" class="task-checkbox">
-                        <span class="task-text">Usar Resear como produto nos vidros dos boxes dos banheiros</span>
-                    </li>
-                    <li class="task-item">
-                        <input type="checkbox" class="task-checkbox">
-                        <span class="task-text">Manter arrumado o sofá da sala e mesas da sala de alimentação</span>
-                    </li>
-                    <li class="task-item">
-                        <input type="checkbox" class="task-checkbox">
-                        <span class="task-text">Em caso de dúvida no check-in, verificar a lista atrás do computador ou avisos na bancada</span>
-                    </li>
-                </ul>
-            </div>
-            <hr class="task-divider">
-            <ul id="afternoon-tasks">
-                <li class="task-item">
-                    <input type="checkbox" class="task-checkbox">
-                    <span class="task-text">Enviar mensagem no grupo STAFF de abertura de turno</span>
-                </li>
-                <li class="task-item">
-                    <input type="checkbox" class="task-checkbox">
-                    <span class="task-text">Fazer login no sistema, verificar check-ins e check-outs do dia</span>
-                </li>
-                <li class="task-item">
-                    <input type="checkbox" class="task-checkbox">
-                    <span class="task-text">Abrir o POS (abrir caixa) para contar dinheiro e fazer inventário dos produtos</span>
-                </li>
-                <li class="task-item">
-                    <input type="checkbox" class="task-checkbox">
-                    <span class="task-text">Varrer a área da frente, dos fundos e terraço</span>
-                </li>
-                <li class="task-item">
-                    <input type="checkbox" class="task-checkbox">
-                    <span class="task-text">Verificar se os quartos que estão aguardando check-ins estão OK</span>
-                </li>
-                <li class="task-item">
-                    <input type="checkbox" class="task-checkbox">
-                    <span class="task-text">Limpar ou enxugar os banheiros (boxes, lixos, repor papel)</span>
-                    <button class="photo-btn">Fotos</button>
-                    <div class="photo-container">
-                        <div class="photo-wrapper">
-                            <div class="photo-box">
-                                <div class="photo-preview">Antes</div>
-                                <button class="take-photo" data-type="before">Tirar Foto Antes</button>
-                            </div>
-                            <div class="photo-box">
-                                <div class="photo-preview">Depois</div>
-                                <button class="take-photo" data-type="after">Tirar Foto Depois</button>
-                            </div>
-                        </div>
-                    </div>
-                </li>
-                <li class="task-item">
-                    <input type="checkbox" class="task-checkbox">
-                    <span class="task-text">Varrer o corredor, escadas e piso do quarto compartilhado</span>
-                </li>
-                <li class="task-item">
-                    <input type="checkbox" class="task-checkbox">
-                    <span class="task-text">Verificar se precisa passar pano com produto no piso da sala e/ou cozinha</span>
-                </li>
-                <li class="task-item">
-                    <input type="checkbox" class="task-checkbox">
-                    <span class="task-text">Ajudar na lavanderia com as roupas de cama quando necessário</span>
-                </li>
-                <li class="task-item">
-                    <input type="checkbox" class="task-checkbox">
-                    <span class="task-text">Varrer os tapetes de entrada, da cozinha e dos banheiros</span>
-                </li>
-                <li class="task-item">
-                    <input type="checkbox" class="task-checkbox">
-                    <span class="task-text">Lavar no tanque os panos de limpeza usados e pendurar na varanda</span>
-                </li>
-                <li class="task-item">
-                    <input type="checkbox" class="task-checkbox">
-                    <span class="task-text">Secar e guardar louças do escorredor</span>
-                </li>
-                <li class="task-item">
-                    <input type="checkbox" class="task-checkbox">
-                    <span class="task-text">Encerrar o turno passando informações para o próximo voluntário</span>
-                </li>
-                <li class="task-item">
-                    <input type="checkbox" class="task-checkbox">
-                    <span class="task-text">Enviar relatório de encerramento no grupo STAFF (nº hóspedes, valor no caixa, recados)</span>
-                </li>
-                <li class="task-item">
-                    <input type="checkbox" class="task-checkbox">
-                    <span class="task-text">Deslogar do POS e do sistema</span>
-                </li>
-            </ul>
-        </div>
-        
-        <div class="shift-section evening">
-            <h2>Turno da Noite</h2>
-            <div class="general-tasks">
-                <h3>Tarefas Gerais (Todos os Turnos)</h3>
-                <ul>
-                    <li class="task-item">
-                        <input type="checkbox" class="task-checkbox">
-                        <span class="task-text">Completar todos os checklists da recepção (avise o próximo voluntário caso não consiga terminar alguma atividade)</span>
-                    </li>
-                    <li class="task-item">
-                        <input type="checkbox" class="task-checkbox">
-                        <span class="task-text">Vender produtos da recepção e receber pagamentos na hora para não criar dívidas</span>
-                    </li>
-                    <li class="task-item">
-                        <input type="checkbox" class="task-checkbox">
-                        <span class="task-text">Passar perfume e ligar a luminária dos quartos com Check-in ao menos 30 minutos antes da chegada</span>
-                    </li>
-                    <li class="task-item">
-                        <input type="checkbox" class="task-checkbox">
-                        <span class="task-text">Ficar sempre com o fone da recepção (utilizar a bolsa preta)</span>
-                    </li>
-                    <li class="task-item">
-                        <input type="checkbox" class="task-checkbox">
-                        <span class="task-text">Usar Resear como produto nos vidros dos boxes dos banheiros</span>
-                    </li>
-                    <li class="task-item">
-                        <input type="checkbox" class="task-checkbox">
-                        <span class="task-text">Manter arrumado o sofá da sala e mesas da sala de alimentação</span>
-                    </li>
-                    <li class="task-item">
-                        <input type="checkbox" class="task-checkbox">
-                        <span class="task-text">Em caso de dúvida no check-in, verificar a lista atrás do computador ou avisos na bancada</span>
-                    </li>
-                </ul>
-            </div>
-            <hr class="task-divider">
-            <ul id="evening-tasks">
-                <li class="task-item">
-                    <input type="checkbox" class="task-checkbox">
-                    <span class="task-text">Enviar mensagem no grupo STAFF de abertura de turno</span>
-                </li>
-                <li class="task-item">
-                    <input type="checkbox" class="task-checkbox">
-                    <span class="task-text">Fazer login no sistema, verificar check-ins e check-outs do dia</span>
-                </li>
-                <li class="task-item">
-                    <input type="checkbox" class="task-checkbox">
-                    <span class="task-text">Abrir o POS (abrir caixa) para contar dinheiro e fazer inventário dos produtos</span>
-                </li>
-                <li class="task-item">
-                    <input type="checkbox" class="task-checkbox">
-                    <span class="task-text">Varrer a área da frente, dos fundos e terraço</span>
-                </li>
-                <li class="task-item">
-                    <input type="checkbox" class="task-checkbox">
-                    <span class="task-text">Juntar os lixos e retirar os sacos que estiverem na entrada (usar alarme às 19:00)</span>
-                </li>
-                <li class="task-item">
-                    <input type="checkbox" class="task-checkbox">
-                    <span class="task-text">Verificar se os quartos que estão aguardando check-ins estão OK</span>
-                </li>
-                <li class="task-item">
-                    <input type="checkbox" class="task-checkbox">
-                    <span class="task-text">Limpar ou enxugar os banheiros (boxes, lixos, repor papel)</span>
-                    <button class="photo-btn">Fotos</button>
-                    <div class="photo-container">
-                        <div class="photo-wrapper">
-                            <div class="photo-box">
-                                <div class="photo-preview">Antes</div>
-                                <button class="take-photo" data-type="before">Tirar Foto Antes</button>
-                            </div>
-                            <div class="photo-box">
-                                <div class="photo-preview">Depois</div>
-                                <button class="take-photo" data-type="after">Tirar Foto Depois</button>
-                            </div>
-                        </div>
-                    </div>
-                </li>
-                <li class="task-item">
-                    <input type="checkbox" class="task-checkbox">
-                    <span class="task-text">Lavar no tanque os panos de limpeza usados e pendurar na varanda</span>
-                </li>
-                <li class="task-item">
-                    <input type="checkbox" class="task-checkbox">
-                    <span class="task-text">Secar e guardar louças do escorredor</span>
-                </li>
-                <li class="task-item">
-                    <input type="checkbox" class="task-checkbox">
-                    <span class="task-text">Encerrar o turno deixando informações para o próximo voluntário</span>
-                </li>
-                <li class="task-item">
-                    <input type="checkbox" class="task-checkbox">
-                    <span class="task-text">Enviar relatório de encerramento no grupo STAFF (nº hóspedes, valor no caixa, recados)</span>
-                </li>
-                <li class="task-item">
-                    <input type="checkbox" class="task-checkbox">
-                    <span class="task-text">Deslogar do POS e do sistema</span>
-                </li>
-            </ul>
-            
-            <h3>Procedimentos de Fechamento</h3>
-            <ul id="closing-tasks">
-                <li class="task-item">
-                    <input type="checkbox" class="task-checkbox">
-                    <span class="task-text">Retirar o filtro da tomada e trancar o cadeado do escritório</span>
-                </li>
-                <li class="task-item">
-                    <input type="checkbox" class="task-checkbox">
-                    <span class="task-text">Colocar máquinas de cartões, celular e fone sem fio do hostel para carregar</span>
-                </li>
-                <li class="task-item">
-                    <input type="checkbox" class="task-checkbox">
-                    <span class="task-text">Fazer a última contagem do caixa do dia</span>
-                </li>
-                <li class="task-item">
-                    <input type="checkbox" class="task-checkbox">
-                    <span class="task-text">Verificar se o freezer de bebidas e o estoque de doces/diversos estão trancados</span>
-                </li>
-                <li class="task-item">
-                    <input type="checkbox" class="task-checkbox">
-                    <span class="task-text">Fechar com chave a porta da varanda (orientar hóspedes a fechar após o uso)</span>
-                </li>
-                <li class="task-item">
-                    <input type="checkbox" class="task-checkbox">
-                    <span class="task-text">Desligar os computadores (colocar revistas sobre o computador da recepção)</span>
-                </li>
-                <li class="task-item">
-                    <input type="checkbox" class="task-checkbox">
-                    <span class="task-text">Apagar as luzes da recepção, cozinha e fundos</span>
-                </li>
-                <li class="task-item">
-                    <input type="checkbox" class="task-checkbox">
-                    <span class="task-text">Guardar as chaves do hostel e do quadro de chaves na recepção</span>
-                </li>
-                <li class="task-item">
-                    <input type="checkbox" class="task-checkbox">
-                    <span class="task-text">Virar a plaquinha da corrente para o lado "fechado" ao finalizar</span>
-                </li>
-            </ul>
-        </div>
+            <div class="task-block">
+        <h3>7h30 - Abertura de Turno</h3>
+        <ul>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Abertura de Turno (Mensagem no grupo)</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Fazer Login do sistema, verificar Check-ins e Check-outs do dia</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Abrir o POS (abrir caixa) para contar dinheiro</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Abrir a Porta da Recepção e do Terraço para arejar</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Ligar o computador da sala (deixar na tela o site do Hostel)</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Colocar música ambiente pelo celular (Bluethooth) em volume baixo</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Guardar Louças que estiverem no Escorredor</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Fazer o Café, colocar Pote de Bolachas e Açucar na bancada</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Oferecer um cafezinho aos nossos Hóspedes</span></li>
+        </ul>
+    </div>
+    <div class="task-block">
+        <h3>7h45 – PRIMEIRA LIMPEZA “Rápida” em todos Banheiros</h3>
+        <ul>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Vasos sanitários (utilizar a escova própria com desinfetante)</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Esvaziar os cestos de lixos</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Varrer tapetes do banheiro e/ou trocar toalhas de piso, se necessário</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Pias e torneiras (Enxugar ou limpar com pano de microfibra)</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Piso do Box (retirar cabelos e limpar com detergente)</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Passar nos Vidros dos Boxes, Espelhos e Torneiras o pano de Microfibra</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Piso do Banheiro – (Passar pano com desinfetante)</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Retirar os itens esquecidos nos banheiros e deixar na salinha enviando fotos avisando o grupo</span></li>
+        </ul>
+    </div>
+    <div class="task-block">
+        <h3>8h30</h3>
+        <ul>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Varrer ou Enxugar a área da Frente, dos Fundos e Terraço</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Molhar as Plantas da Entrada, Fundos e do Terraço</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Retirar Lixos que estiverem cheios e trocar o saco</span></li>
+        </ul>
+    </div>
+    <div class="task-block">
+        <h3>9h00</h3>
+        <ul>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Verificar caixinha do “Check-out Express” antes de subir para os Quartos</span></li>
+        </ul>
+    </div>
+    <div class="task-block">
+        <h3>9h15</h3>
+        <ul>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Verificar se os Quartos com previsão de Check-ins estão limpos e arrumados</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Fazer limpeza e arrumação dos quartos que já fizeram Check-out</span></li>
+        </ul>
+    </div>
+    <div class="task-block">
+        <h3>10h00</h3>
+        <ul>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Pano com álcool nas mesas do refeitório, Balcão e limpar o Fogão</span></li>
+        </ul>
+    </div>
+    <div class="task-block">
+        <h3>10h30</h3>
+        <ul>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Varrer os tapetes de Entrada, da Cozinha e dos Fundos</span></li>
+        </ul>
+    </div>
+    <div class="task-block">
+        <h3>11h00 – CHECK-OUTs</h3>
+        <ul>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Localizar Hóspede. Ficarão um pouco mais (1h) e/ou desejam Meia diária</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Retirar o Café, Açucar, encher o pote de bolachas antes de guardar</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Secar e guardar louças dos Hóspedes deixadas no Escorredor</span></li>
+        </ul>
+    </div>
+    <div class="task-block">
+        <h3>11h10</h3>
+        <ul>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Arrumação e Limpeza dos Quartos que tiveram Check-outs</span></li>
+        </ul>
+    </div>
+    <div class="task-block">
+        <h3>11h45 – SEGUNDA LIMPEZA “Rápida” em todos Banheiros</h3>
+        <ul>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Mesmas atividades das 7h45. (VIDE ATIVIDADES ACIMA)</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Lavar os panos de limpeza que utilizou após o uso e pendurar na varanda</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Manter o cesto com produtos de Limpeza e os Panos do armario da Lavanderia organizados</span></li>
+        </ul>
+    </div>
+    <div class="task-block">
+        <h3>13h00 – Encerramento de Turno</h3>
+        <ul>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Fazer a contagem do Inventário junto com o próximo voluntário</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Fechar os quartos que estavam abertos para arejar</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Passar informações ou Recados ao próximo Voluntário</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Deslogar do POS e do Sistema</span></li>
+        </ul>
+    </div>
+</div>
+
+<!-- TURNO DA TARDE -->
+<div class="shift-section afternoon">
+    <h2>Turno da Tarde (13:00-18:00)</h2>
+    <div class="task-block">
+        <h3>13h00 - Abertura de Turno</h3>
+        <ul>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Abertura de Turno (Mensagem no grupo)</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Fazer Login no Sistema, verificar Check-ins e Check-outs do dia</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Abrir o POS (abrir caixa) para contar dinheiro</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Colocar música ambiente pelo celular (Bluethooth) em volume baixo</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Verificar se os Quartos que estão aguardando Check-ins estão limpos e arrumados</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Guardar Louças que estiverem no Escorredor</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Varrer ou passar rodo na área da frente, dos Fundos e Terraço</span></li>
+        </ul>
+    </div>
+    <div class="task-block">
+        <h3>13h30 – PRIMEIRA LIMPEZA “Rápida” em todos Banheiros</h3>
+        <ul>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Vasos sanitários (utilizar a escova própria com desinfetante)</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Esvaziar os cestos de lixos</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Varrer tapetes do banheiro e/ou trocar toalhas de piso, se necessário</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Pias e torneiras (Enxugar ou limpar com pano de microfibra)</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Piso do Box (retirar cabelos e limpar com detergente)</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Passar nos Vidros dos Boxes, Espelhos e Torneiras o pano de Microfibra</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Piso do Banheiro – (Passar pano com desinfetante)</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Retirar itens esquecidos nos banheiros e deixar na salinha enviando fotos avisando o grupo</span></li>
+        </ul>
+    </div>
+    <div class="task-block">
+        <h3>14h00</h3>
+        <ul>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Varrer o Corredor dos Quartos Privativos, Piso do Quarto compartilhado e Escadas</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Verificar se precisa passar um pano com produto no piso da Sala e/ou Cozinha</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Varrer os tapetes de Entrada, da Cozinha e dos Banheiros com vassoura</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Secar e guardar louças dos Hóspedes deixadas no escorredor</span></li>
+        </ul>
+    </div>
+    <div class="task-block">
+        <h3>16h30 – SEGUNDA LIMPEZA “Rápida” em todos Banheiros</h3>
+        <ul>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Mesmas atividades das 13h30. (VIDE ATIVIDADES ACIMA)</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Lavar os panos de limpeza que utilizou após o uso e pendurar na varanda</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Manter o cesto com produtos de Limpeza e os Panos do armario da Lavanderia organizados</span></li>
+        </ul>
+    </div>
+    <div class="task-block">
+        <h3>18h00 – Encerramento de Turno</h3>
+        <ul>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Fazer a contagem do Inventário junto com o próximo voluntário</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Passar informações ou Recados ao próximo Voluntário</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Deslogar do POS e do Sistema</span></li>
+        </ul>
+    </div>
+</div>
+
+<!-- TURNO DA NOITE -->
+<div class="shift-section evening">
+    <h2>Turno da Noite (18:00-23:30)</h2>
+    <div class="task-block">
+        <h3>18h00 - Abertura de Turno</h3>
+        <ul>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Abertura de Turno (Mensagem no grupo)</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Fazer Login no sistema, verificar Check-ins e Check-outs do dia</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Abrir o POS (abrir caixa) para contar dinheiro</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Verificar se os Quartos que estão aguardando Check-ins estão “Ok”</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Colocar música ambiente pelo celular (Bluethooth) em volume baixo</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Verificar se os Quartos que estão aguardando Check-ins estão limpos e arrumados</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Guardar Louças que estiverem no Escorredor</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Varrer ou passar rodo na área da frente, dos Fundos e Terraço</span></li>
+        </ul>
+    </div>
+    <div class="task-block">
+        <h3>19h30</h3>
+        <ul>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Colocar sacos de Lixos que estiverem no Cesto Preto da entrata na rua para coleta</span></li>
+        </ul>
+    </div>
+    <div class="task-block">
+        <h3>19h15 – PRIMEIRA Limpeza “Rápida” em todos Banheiros</h3>
+        <ul>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Vasos sanitários (utilizar a escova própria com desinfetante)</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Esvaziar os cestos de lixos</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Varrer tapetes do banheiro e/ou trocar toalhas de piso, se necessário</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Pias e torneiras (Enxugar ou limpar com pano de microfibra)</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Piso do Box (retirar cabelos e limpar com detergente)</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Passar nos Vidros dos Boxes, Espelhos e Torneiras o pano de Microfibra</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Piso do Banheiro – (Passar pano com desinfetante)</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Retirar itens esquecidos nos banheiros e deixar na salinha enviando fotos avisando o grupo</span></li>
+        </ul>
+    </div>
+    <div class="task-block">
+        <h3>20h00</h3>
+        <ul>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Aguardar os hóspedes dos Check-ins que constam no Sistema</span></li>
+        </ul>
+    </div>
+    <div class="task-block">
+        <h3>23h00 – SEGUNDA Limpeza “Rápida” em todos Banheiros</h3>
+        <ul>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Mesmas atividades das 19H45. (VIDE ATIVIDADES ACIMA)</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Lavar os panos de limpeza que utilizou após o uso e pendurar na varanda</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Manter o cesto com produtos de Limpeza e os Panos do armario da Lavanderia organizados</span></li>
+        </ul>
+    </div>
+    <div class="task-block">
+        <h3>23h15</h3>
+        <ul>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Verificar e Informar no grupo Staff se ainda há Hóspede que não realizou o Checkin</span></li>
+        </ul>
+    </div>
+    <div class="task-block">
+        <h3>23h30 – ATENÇÃO - Fechamento do Hostel</h3>
+        <ul>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Secar e guardar as louças deixadas pelos Hóspedes no Escorredor</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Verificar se o freezer de bebidas e o estoque dos doces/diversos estão trancados</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Trancar a Porta da Varanda (caso tenha hóspede, orientá-lo a fechar após o uso)</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Desligar os 2 computadores (coloque as revistas por cima do notebook e apague a luz da luminária)</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Apagar as Luzes da Recepção e Luzes decorativas do balcão da cozinha</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Vire a plaquinha da corrente para o lado “fechado” ao finalizar o turno</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Verificar se as máquinas de cartões e celular da Recepção estão carregando</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Colocar o fone sem Fio do Hostel na base para carregar</span></li>
+            <li class="task-item"><input type="checkbox" class="task-checkbox"><span class="task-text">Guardar o molho de chaves do Hostel no local combinado</span></li>
+        </ul>
+    </div>
+</div>
         
         <!-- Modifique a div room-movements-box -->
         <div class="room-movements-box">
@@ -672,12 +493,18 @@
         <div class="observations-box">
             <h3>Observações para o Próximo Turno</h3>
             <textarea id="shift-observations" placeholder="Digite aqui recados importantes para o próximo turno (ex: hóspedes aguardando check-in, problemas a resolver, etc)" rows="4"></textarea>
+            <button class="save-btn" id="save-progress-btn" style="margin-top: 22px;">Salvar Progresso</button>
         </div>
-        
-        <button class="save-btn" id="save-progress-btn">Salvar Progresso</button>
     </div>
 
-
+    <!-- Modal de seleção de voluntário -->
+<div class="select-volunteer-modal" id="select-volunteer-modal" style="display:none;">
+    <h4>Escolha o voluntário e a cor</h4>
+    <select id="volunteer-select"></select>
+    <input type="color" id="volunteer-color-picker" value="#F47B20" style="margin:10px 0;">
+    <button class="form-btn" id="confirm-volunteer">Adicionar</button>
+    <button class="form-btn" id="close-modal">Cancelar</button>
+</div>
     
     <script src="script.js"></script>
 
